@@ -51,3 +51,15 @@ Dated entries, newest last. Numbers where there are numbers.
   cached version takes 1.6 s, with a content download 8.2 s (39 blobs).
 * Decision: proceed with the Steam build; hand-off item 2 (command-line connect) is now the gating test.
 * Added the Lizard address to the `server.py` test vectors.
+
+## 2026-09-26 (later): the Steam launcher takes commands; discovery module
+
+* Jacob ran `bin_x64\SS14.Launcher.exe ss14s://lizard.spacestation14.io/server` against the running Steam
+  launcher: the client started and attempted the join (denied, server full). The gating test passed; the
+  join milestone is unblocked. He reports a `dotnet_x86` folder in the install.
+* Jacob asked for (1) a matrix of common install locations checked before asking, (2) a configuration
+  window. Both recorded in the plan; the GUI moved into M3 as required.
+* Built `launcher.py`: install description (`LauncherInstall`), runtime folder detection, Steam library
+  discovery through `libraryfolders.vdf`, root from the launcher log's `Launch command`, root from a running
+  launcher process (psutil), common standalone folders, and `find_launcher` in priority order. `doctor` CLI
+  command prints the result. 54 tests pass. `psutil` added as the first runtime dependency.

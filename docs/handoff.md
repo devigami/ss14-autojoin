@@ -8,19 +8,11 @@ the repository (`docs/fixtures/`) or the session, and tick the item. Nothing els
 1. ~~Launcher install path~~ **Known from the launcher log (2026-09-26)**:
    `D:\SteamLibrary\steamapps\common\Space Station 14 Playtest\` (Steam build 0.40.1.0). Please confirm it
    contains `bin_x64\SS14.Launcher.exe` and a `dotnet_x64\` folder (`dir` of that folder is enough).
-2. **Connect by command line.** With the launcher running and logged in, in PowerShell:
-
-   ```powershell
-   $env:DOTNET_ROOT = "<install>\dotnet_x64"
-   & "<install>\bin_x64\SS14.Launcher.exe" "ss14://<target server>"
-   ```
-
-   with `<install>` = `D:\SteamLibrary\steamapps\common\Space Station 14 Playtest` and the target
-   `ss14s://lizard.spacestation14.io/server`. Success: the console prints `Passed commands to primary
-   launcher`, the launcher window comes to the front and starts connecting, and the launcher log gains a
-   `Connect command: "ss14s://lizard.spacestation14.io/server", ""` line. Then quit the launcher and run the
-   same command again: it should start the launcher (Steam may need to be running) and connect once the
-   account is logged in. **This is the one test that decides whether the Steam build can be driven at all.**
+2. ~~Connect by command line~~ **Done 2026-09-26: works on the Steam build** (client launched and got the
+   server-full denial). Two small follow-ups: (a) paste a `dir` of
+   `D:\SteamLibrary\steamapps\common\Space Station 14 Playtest` (which `dotnet_*` and `bin_*` folders exist);
+   (b) with the launcher **closed** and Steam running, run the same command once more: does the launcher start
+   and connect by itself? Note whether Steam shows the game as running.
 3. ~~Capture a failed attempt~~ **Done 2026-09-25**, twice: `client.stdout.full.log` (copied while the client
    was open, truncated by the launcher's buffer) and `client.stdout.full-after-exit.log` (complete, with the
    denial). Launcher log received too (`docs/fixtures/launcher.log`).
@@ -30,7 +22,7 @@ the repository (`docs/fixtures/`) or the session, and tick the item. Nothing els
 
 ## Later (M2, M3)
 
-6. Run `uv run ss14-autojoin doctor` on Windows and paste the output (detected paths, pipe name, log files).
+6. Run `uv run ss14-autojoin doctor` on Windows and paste the output (it exists now: detected install, runtime folder, log paths).
 7. First end-to-end run: `uv run ss14-autojoin join ss14://<server>` while the server is full. Success: the
    tool logs each poll, launches when a slot appears, and either reports "joined" or cleans up and resumes.
    Paste the tool's log.

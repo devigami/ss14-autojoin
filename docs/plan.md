@@ -43,12 +43,33 @@ anything else), it closes the failed game client and goes back to watching, unti
 | `launcher.py` | locate the launcher install (config, then `bin_x64\SS14.Launcher.exe` search) and data dirs; check the pipe; send `r`/`c<uri>` over the pipe or by starting the exe with `DOTNET_ROOT`; read the launcher log for `Connect command`, `Dropping connect command`, `Failed to connect`, `PID` | mostly (fake filesystem and fake process runner; the pipe write and exe start are thin adapters) |
 | `client.py` | track the game client: PID from the launcher log or `SS14.Loader` processes started after the command (`psutil`); tail `client.stdout.log` from the start of the new file; classify lines into `connecting` / `joined` / `failed(reason, delay)` / `disconnected(reason)`; terminate the process | yes (fixture logs; a dummy process) |
 | `joiner.py` | the state machine below; owns timeouts and cooldowns; drives watcher, launcher and client; emits events for the UI/CLI | yes (all dependencies injected) |
-| `cli.py` | `ss14-autojoin status <address>`, `watch <address>` (poll and print), `join <address>` (the full loop), `servers <filter>` (hub lookup, Windows only), `doctor` (prints detected launcher paths, pipe name, log paths) | yes for parsing and `status`/`watch` |
+| `cli.py` | `ss14-autojoin status <address>`, `watch <address>` (poll and print), `join <address>` (the full loop), `servers <filter>` (hub lookup, Windows only), `doctor` (prints detected launcher install, runtime folder, log paths) | yes for parsing and `status`/`watch`/`doctor` |
+| `config.py` | TOML settings file (`%APPDATA%\ss14-autojoin\config.toml`): launcher folder, server address, poll interval, margin, rejoin, restart-launcher flags; defaults filled from discovery | yes |
 | `notify.py` | sound or toast when joined or stuck (later) | partly |
-| `app.py` | thin Tkinter window over `joiner` (later, optional) | headless smoke only |
+| `app.py` | Tkinter window over `joiner`: a status line, Start/Stop, and a **settings panel** for the game/launcher folder (with the detected value pre-filled and a Browse button), server address, poll interval, margin, options; writes `config.toml` (**required**, Jacob's request of 2026-09-26) | headless smoke only |
 
 Configuration: command-line flags first, then a small TOML file (`%APPDATA%\ss14-autojoin\config.toml`) for the
 launcher path and defaults. No secrets are involved: the tool never sees the account token.
+
+## Finding the launcher (`launcher.py`, built 2026-09-26)
+
+Order of candidates, first hit wins; each is a folder that must hold `bin_x64\SS14.Launcher.exe`
+(`bin_arm64`, or `bin` for the Linux tarball):
+
+1. The configured path (settings window or `--launcher`); it may point at the root, at `bin_x64`, or at the exe.
+2. A **running launcher process** (`SS14.Launcher.exe` via psutil): its exe's grandparent is the root.
+3. The **newest launcher log**'s `Launch command:` line, which names `<root>\bin_x64\loader\SS14.Loader.exe`.
+4. **Steam libraries**: Steam's install dir from the registry (`HKCU\Software\Valve\Steam\SteamPath`),
+   `%ProgramFiles(x86)%\Steam`, `%ProgramFiles%\Steam`, then every library listed in
+   `steamapps\libraryfolders.vdf`, each checked for `steamapps\common\Space Station 14 Playtest` and
+   `steamapps\common\Space Station 14`.
+5. **Standalone zip spots**: `%LOCALAPPDATA%`, `%LOCALAPPDATA%\Programs`, Program Files, `Downloads`,
+   `Desktop`, `Documents`, `Games`, the home folder, and `X:\Games`, `X:\` for drives C to F, each with the
+   names `Space Station 14 Launcher`, `SS14.Launcher_Windows`, `SS14.Launcher`, `SS14 Launcher`.
+
+The result records the source, the loader exe, and the bundled runtime folder (`dotnet_x64` preferred, any
+`dotnet*` with `dotnet.exe` accepted, since Jacob's Steam install shows `dotnet_x86`). `ss14-autojoin doctor`
+prints all of it. The settings window shows the detected path and lets the user override it.
 
 ## The state machine (`joiner.py`)
 
@@ -122,9 +143,9 @@ exists.
    ss14://<server>` on Windows and see slot changes.
 3. **M2, join**: `launcher.py`, `client.py`, `joiner.py`, `cli.py join|doctor`, fixture logs from Jacob. First
    end-to-end join on Windows.
-4. **M3, robust**: stuck recovery, `--rejoin`, non-full reasons stop the loop, config file, notifications,
-   `build.py` and the Windows CI artifact, release `v0.1.0`.
-5. **M4, optional**: Tkinter window (address, status line, big Start/Stop), hub lookup by server name.
+4. **M3, app**: `config.py`, the Tkinter window with the settings panel, stuck recovery, `--rejoin`, non-full
+   reasons stop the loop, notifications, `build.py` and the Windows CI artifact, release `v0.1.0`.
+5. **M4, optional**: hub lookup by server name in the settings panel.
 
 ## Open questions (answers go to `decisions.md`)
 

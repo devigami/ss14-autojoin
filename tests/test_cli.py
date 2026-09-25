@@ -57,3 +57,17 @@ def test_watch_reports_slot_and_offline(fake_server: FakeStatusServer, capsys: p
 def test_format_status_without_cap_or_round() -> None:
     line = format_status(ServerStatus.from_json({"name": "bare", "players": 3, "panic_bunker": True}))
     assert line == "bare | 3/no cap players | slot free | run level unknown | panic bunker on"
+
+
+def test_doctor_reports_install(tmp_path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch) -> None:
+    from ss14_autojoin import launcher as L
+
+    root = tmp_path / "Inst"
+    (root / "bin_x64" / "loader").mkdir(parents=True)
+    (root / "bin_x64" / L.LAUNCHER_EXE).write_bytes(b"")
+    monkeypatch.setattr("ss14_autojoin.cli.running_launcher_exes", list)
+    assert main(["doctor", "--launcher", str(root)]) == EXIT_OK
+    out = capsys.readouterr().out
+    assert f"launcher install:  {root} (standalone, found via configured)" in out
+    assert "loader exe:        missing" in out
+    assert main(["doctor", "--launcher", str(tmp_path / "nothing")]) == EXIT_UNREACHABLE

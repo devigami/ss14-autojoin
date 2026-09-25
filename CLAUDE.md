@@ -19,15 +19,18 @@ general SS14 notes and the conventions this project follows; clone it when you n
   detection is timeout-based (`docs/plan.md`, "Why this detection method").
 * **Known (2026-09-26)**: Steam launcher 0.40.1.0 at `D:\SteamLibrary\steamapps\common\Space Station 14
   Playtest`; target Lizard `ss14s://lizard.spacestation14.io/server`; all four fixtures in `docs/fixtures/`.
-* **Waiting on Jacob**: hand-off item 2, the command-line connect test on the Steam build. It decides
-  whether the launcher can be driven from outside at all.
-* **Works today**: `uv run ss14-autojoin status <address>` and `watch <address>` (poll and print; no
-  joining yet).
+* **Verified 2026-09-26**: the Steam launcher accepts `bin_x64\SS14.Launcher.exe <uri>` and connects. Join
+  milestone unblocked. `launcher.py` (install discovery) and `doctor` exist; next is `client.py` (log
+  parsing, process tracking) and `joiner.py`, then the Tkinter settings window (M3, required).
+* **Waiting on Jacob**: a `dir` of the install folder and the "launcher closed" variant of the connect test
+  (`docs/handoff.md`, item 2); `doctor` output once he runs it (item 6).
+* **Works today**: `uv run ss14-autojoin status <address>`, `watch <address>` (poll and print) and `doctor`
+  (finds the launcher install); no joining yet.
 
 ## Stack and commands
 
 Python 3.14, uv, `pyproject.toml`, src layout, ruff, pytest; PyInstaller `--onefile` for the Windows binary
-(added in M3). Standard library for HTTP; `psutil` for processes (added in M2). No other runtime dependencies
+(added in M3). Standard library for HTTP; `psutil` for processes. No other runtime dependencies
 without a line in `docs/decisions.md`.
 
 ```
@@ -47,8 +50,8 @@ install --user --upgrade uv` puts a current uv in `~/.local/bin` (that is what h
 CLAUDE.md                 this file
 README.md                 what it is, status, how to run
 pyproject.toml, uv.lock   project and pins (lock is committed)
-src/ss14_autojoin/        server.py (addresses, /status), cli.py; later watcher.py, launcher.py, client.py,
-                          joiner.py, notify.py, app.py
+src/ss14_autojoin/        server.py (addresses, /status), launcher.py (install discovery), cli.py; later
+                          watcher.py, client.py, joiner.py, config.py, notify.py, app.py (Tkinter settings window)
 tests/                    pytest; fake HTTP server, fixture logs under docs/fixtures/
 docs/                     plan.md, ss14-launcher-reference.md, decisions.md, handoff.md, project-log.md,
                           fixtures/ (real logs from Jacob's machine, redacted)

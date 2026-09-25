@@ -17,13 +17,14 @@ uv sync --all-groups
 uv run ss14-autojoin status ss14://server.example.org        # one status fetch (scheme optional, port defaults to 1212)
 uv run ss14-autojoin status ss14://server.example.org --json
 uv run ss14-autojoin watch  ss14://server.example.org --interval 3   # print whenever the slot situation changes
+uv run ss14-autojoin doctor                                          # find the launcher install and its data folders
 uv run pytest
 ```
 
 ## Layout
 
-* `src/ss14_autojoin/` the code: `server.py` (addresses, `/status`), `cli.py`. Coming: `watcher.py`,
-  `launcher.py`, `client.py`, `joiner.py`.
+* `src/ss14_autojoin/` the code: `server.py` (addresses, `/status`), `launcher.py` (finding the install),
+  `cli.py`. Coming: `watcher.py`, `client.py`, `joiner.py`, `config.py`, `app.py`.
 * `tests/` pytest, with a local fake status server.
 * `docs/` `plan.md`, `ss14-launcher-reference.md` (verified facts about the launcher, engine and content),
   `decisions.md`, `handoff.md`, `project-log.md`.

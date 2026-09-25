@@ -310,8 +310,13 @@ Useful launcher log lines: `Connect command: "<uri>", "<reason>"`, `Dropping con
   `bin_x64\`, `bin_x64\loader\SS14.Loader.exe`, `bin_x64\signing_key`. The client gets one extra argument,
   `--cvar branding.steam=true`. The log lines match the open-source launcher code line for line, so the Steam
   fork is the same code plus Steam bits (`ConfigureMultiWindow` says "implemented in private repo for Steam").
-  **Unverified**: whether `bin_x64\SS14.Launcher.exe <uri>` and the named pipe work in the Steam build, and
-  whether Steam must be running for the launcher to start (hand-off item 2).
+  **Verified 2026-09-26**: with the Steam launcher running,
+  `bin_x64\SS14.Launcher.exe ss14s://lizard.spacestation14.io/server` (with `DOTNET_ROOT` set) made the
+  launcher start the client and connect (the server was full, the usual denial). Whether the launcher can be
+  *started* that way with Steam closed, and the named pipe from Python, remain unverified.
+* Jacob reports a `dotnet_x86` folder in the install (the open-source bootstrap expects `dotnet_x64`). The
+  tool accepts any `dotnet*` folder holding `dotnet.exe`, preferring `dotnet_x64`; a `dir` listing of the
+  install root is still wanted to settle which folders exist.
 * Data directories are the standard ones: engines under
   `C:\Users\jacob\AppData\Roaming\Space Station 14\launcher\engines\290.0.0.zip`.
 * **Wizard's Den Lizard** is favourited as `ss14s://lizard.spacestation14.io/server`: status at

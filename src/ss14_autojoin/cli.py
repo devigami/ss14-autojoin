@@ -1,4 +1,4 @@
-"""Command line: ``ss14-autojoin status <address>`` and ``ss14-autojoin watch <address>``.
+"""Command line: ``ss14-autojoin status|watch <address>`` and ``ss14-autojoin doctor``.
 
 Joining (``join``) arrives with milestone M2; see ``docs/plan.md``.
 """
@@ -10,8 +10,10 @@ import json
 import sys
 import time
 from collections.abc import Sequence
+from pathlib import Path
 
 from . import __version__
+from .launcher import find_launcher, launcher_data_dir, running_launcher_exes
 from .server import STATUS_TIMEOUT, AddressError, ServerAddress, ServerStatus, ServerUnreachable, fetch_status
 
 EXIT_OK = 0
@@ -39,6 +41,9 @@ def build_parser() -> argparse.ArgumentParser:
     watch.add_argument(
         "--max-polls", type=int, default=None, help="stop after this many polls (default: run until Ctrl+C)"
     )
+
+    doctor = commands.add_parser("doctor", help="find the launcher installation and data folders and print them")
+    doctor.add_argument("--launcher", type=Path, default=None, help="launcher install folder to check first")
     return parser
 
 
@@ -106,7 +111,23 @@ def cmd_watch(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
-_COMMANDS = {"status": cmd_status, "watch": cmd_watch}
+def cmd_doctor(args: argparse.Namespace) -> int:
+    data_dir = launcher_data_dir()
+    print(f"launcher data dir: {data_dir} ({'exists' if data_dir.is_dir() else 'missing'})")
+    print(f"launcher log dir:  {data_dir / 'logs'}")
+    print(f"client stdout log: {data_dir / 'logs' / 'client.stdout.log'}")
+    install = find_launcher(args.launcher, launcher_log_dir=data_dir / "logs", process_exes=running_launcher_exes)
+    if install is None:
+        print("launcher install:  not found (pass --launcher <folder that holds bin_x64>)")
+        return EXIT_UNREACHABLE
+    print(f"launcher install:  {install.root} ({install.flavour}, found via {install.source})")
+    print(f"launcher exe:      {install.launcher_exe}")
+    print(f"loader exe:        {install.loader_exe or 'missing'}")
+    print(f"dotnet root:       {install.dotnet_root or 'missing (a system-wide .NET runtime is then required)'}")
+    return EXIT_OK
+
+
+_COMMANDS = {"status": cmd_status, "watch": cmd_watch, "doctor": cmd_doctor}
 
 
 def main(argv: Sequence[str] | None = None) -> int:

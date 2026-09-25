@@ -5,7 +5,9 @@ description = "Watches a Space Station 14 server and joins it through the offici
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "psutil>=6",
+]
 
 [project.scripts]
 ss14-autojoin = "ss14_autojoin.cli:main"
