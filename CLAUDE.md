@@ -22,8 +22,10 @@ general SS14 notes and the conventions this project follows; clone it when you n
 * **Verified 2026-09-26**: the Steam launcher accepts `bin_x64\SS14.Launcher.exe <uri>` and connects. Join
   milestone unblocked. `launcher.py` (install discovery) and `doctor` exist; next is `client.py` (log
   parsing, process tracking) and `joiner.py`, then the Tkinter settings window (M3, required).
-* **Waiting on Jacob**: a `dir` of the install folder and the "launcher closed" variant of the connect test
-  (`docs/handoff.md`, item 2); `doctor` output once he runs it (item 6).
+* **Verified 2026-09-26 (evening)**: cold start with a URI works too (launcher starts, logs in, connects in
+  about 6 s). Install has `bin_x64` and `dotnet_x64`. Nothing blocks M2 now.
+* **Waiting on Jacob**: `doctor` output and the first end-to-end `join` run once they exist (`docs/handoff.md`,
+  items 6 and 7).
 * **Works today**: `uv run ss14-autojoin status <address>`, `watch <address>` (poll and print) and `doctor`
   (finds the launcher install); no joining yet.
 

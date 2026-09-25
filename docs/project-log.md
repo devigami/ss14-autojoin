@@ -63,3 +63,13 @@ Dated entries, newest last. Numbers where there are numbers.
   discovery through `libraryfolders.vdf`, root from the launcher log's `Launch command`, root from a running
   launcher process (psutil), common standalone folders, and `find_launcher` in priority order. `doctor` CLI
   command prints the result. 54 tests pass. `psutil` added as the first runtime dependency.
+
+## 2026-09-26 (evening): cold start works; install layout confirmed
+
+* `dir` of the install: `bin` (2025 leftover), `bin_x64`, `dotnet_x64`, `console.bat`, the bootstrap exe. The
+  earlier `dotnet_x86` was a misreading.
+* The command-line connect works with the launcher closed too: it starts, queues `r` and `c<uri>`, logs in,
+  connects; client PID 5.7 s after start. Warm: `Connect command` to `Launch command` 3.2 s. The launcher log
+  has `Launcher command: ...` lines for pipe/command-line connects. Fixture `launcher.log` extended.
+* Consequence: no "launcher must be running" precondition; restarting a stuck launcher with the URI is a
+  clean recovery.

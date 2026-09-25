@@ -106,9 +106,11 @@ Rules:
 * **JOINED**: stop by default (the tool did its job). With `--rejoin`, keep watching the client and go back
   to WATCHING when it exits or logs a disconnect; note that a player who was in the round bypasses the cap on
   reconnect anyway (§5), so `--rejoin` mostly matters after a client exit.
-* **STUCK**: the launcher is showing an errored overlay and drops connects. Notify the user. With
-  `--restart-launcher` (opt-in), terminate `SS14.Launcher.exe` and start it again with the URI, which both
-  clears the overlay and queues the connect.
+* **STUCK**: the launcher is showing an errored overlay and drops connects (`Dropping connect command` in its
+  log). Notify the user. With `--restart-launcher` (opt-in), terminate `SS14.Launcher.exe` and start it again
+  with the URI, which both clears the overlay and queues the connect: verified on 2026-09-26 that a cold
+  start with a URI logs in and connects by itself (about 6 s to the client).
+* **Launcher not running** is not a special case: the same command starts it and queues the connect.
 
 ## Why this detection method
 

@@ -310,13 +310,16 @@ Useful launcher log lines: `Connect command: "<uri>", "<reason>"`, `Dropping con
   `bin_x64\`, `bin_x64\loader\SS14.Loader.exe`, `bin_x64\signing_key`. The client gets one extra argument,
   `--cvar branding.steam=true`. The log lines match the open-source launcher code line for line, so the Steam
   fork is the same code plus Steam bits (`ConfigureMultiWindow` says "implemented in private repo for Steam").
-  **Verified 2026-09-26**: with the Steam launcher running,
-  `bin_x64\SS14.Launcher.exe ss14s://lizard.spacestation14.io/server` (with `DOTNET_ROOT` set) made the
-  launcher start the client and connect (the server was full, the usual denial). Whether the launcher can be
-  *started* that way with Steam closed, and the named pipe from Python, remain unverified.
-* Jacob reports a `dotnet_x86` folder in the install (the open-source bootstrap expects `dotnet_x64`). The
-  tool accepts any `dotnet*` folder holding `dotnet.exe`, preferring `dotnet_x64`; a `dir` listing of the
-  install root is still wanted to settle which folders exist.
+  **Verified 2026-09-26, both ways**: `bin_x64\SS14.Launcher.exe ss14s://lizard.spacestation14.io/server`
+  (with `DOTNET_ROOT` set) connects when the launcher is running (log: `Launcher command: r`,
+  `Launcher command: css14s://...`, `Connect command: "...", ""` 2 ms later, `Launch command` 3.2 s later) and
+  also when it is **closed**: the new process becomes the launcher, logs the two queued commands 0.7 s after
+  start, refreshes the token, sets the account `Available`, then runs the connect (`Connect command` at
+  +2.7 s, client PID at +5.7 s). Steam was running; whether Steam must be is untested. The named pipe from
+  Python remains unverified and unnecessary.
+* Install root contents (`dir`, 2026-09-26): `bin\` (old, 2025), `bin_x64\`, `dotnet_x64\`, `console.bat`,
+  `Space Station 14 Launcher.exe`. So the runtime folder is the standard `dotnet_x64`; the tool still accepts
+  other `dotnet*` names.
 * Data directories are the standard ones: engines under
   `C:\Users\jacob\AppData\Roaming\Space Station 14\launcher\engines\290.0.0.zip`.
 * **Wizard's Den Lizard** is favourited as `ss14s://lizard.spacestation14.io/server`: status at
@@ -332,9 +335,11 @@ Useful launcher log lines: `Connect command: "<uri>", "<reason>"`, `Dropping con
   twice (stdout and stderr) when the client exits. A connect started from the UI writes **no** `Connect command`
   line; only command-line or pipe connects do (`LauncherCommands.Connect`). The favourites and hub refresh
   every few minutes as `Seeking connection to Unspecified/<host>:443` lines.
-* **Measured timings**: `/info` accepted to `Launch command` took 8.2 s with a content update (39 blobs) and
-  1.6 s with the version cached (the engine manifest check against `robust-builds.cdn` is the 1.5 s). Client
-  start to denial is not timestamped in the client log; the failed client lived 61 s until Jacob pressed Exit.
+* **Measured timings**: `Connect command` to `Launch command` took 3.2 s with the content version cached
+  (`/info` 0.8 s, privacy/version check 0.8 s, engine manifest check against `robust-builds.cdn` 1.5 s) and
+  about 8 s more when 39 content blobs had to be downloaded. Cold start of the launcher to `Launch command`:
+  5.7 s. Client start to denial is not timestamped in the client log; the failed clients lived 61 s and
+  148 s until Jacob pressed Exit.
 
 ## 12. Timing constants
 

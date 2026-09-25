@@ -20,4 +20,7 @@ everything else is verbatim.
 
 * `launcher.log` (2026-09-26, launcher 0.40.1.0, **Steam build**): the launcher's own log around the successful
   join (client PID 7136, 08:45 to 09:04) and the failed one (PID 26840, 09:05:27 to 09:06:28). Trimmed of repeated
-  hub and favourite refresh lines and of the migration noise; account id replaced with zeros.
+  hub and favourite refresh lines and of the migration noise; account id replaced with zeros. Extended 2026-09-26
+  with two command-line connects: one with the launcher running (09:22, forwarded over the pipe, `Launcher
+  command: r` / `css14s://...` then `Connect command:`), one with the launcher closed (09:34: the launcher
+  starts, queues the commands, logs in, then connects; client PID 17572 launched 5.7 s after start).
