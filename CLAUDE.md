@@ -11,9 +11,10 @@ general SS14 notes and the conventions this project follows; clone it when you n
 
 ## Status (update this section every session)
 
-* **Milestone**: M0 done on 2026-09-25 (research, plan, scaffold, `server.py` with tests, CI). Next: M1
-  (`watcher.py`, fixtures, back-off) and, once Jacob's fixtures arrive, M2 (`launcher.py`, `client.py`,
-  `joiner.py`).
+* **Milestone**: M0 and M1 done 2026-09-25 (scaffold, `server.py`, `status`/`watch`); M2 code complete
+  2026-09-26 (`launcher.py`, `client.py`, `joiner.py`, `runtime.py`, `join`), **not yet run on Windows**.
+  Next: Jacob's first `join` run (hand-off item 7), fix what it shows, then M3 (`config.py`, Tkinter settings
+  window, `build.py`, Windows CI artifact).
 * **Have from Jacob (2026-09-25)**: a successful and a failed `client.stdout.log` (`docs/fixtures/`). The
   failed one revealed that the launcher does not flush the log while the client is quiet, so failure
   detection is timeout-based (`docs/plan.md`, "Why this detection method").
@@ -23,11 +24,10 @@ general SS14 notes and the conventions this project follows; clone it when you n
   milestone unblocked. `launcher.py` (install discovery) and `doctor` exist; next is `client.py` (log
   parsing, process tracking) and `joiner.py`, then the Tkinter settings window (M3, required).
 * **Verified 2026-09-26 (evening)**: cold start with a URI works too (launcher starts, logs in, connects in
-  about 6 s). Install has `bin_x64` and `dotnet_x64`. Nothing blocks M2 now.
-* **Waiting on Jacob**: `doctor` output and the first end-to-end `join` run once they exist (`docs/handoff.md`,
-  items 6 and 7).
-* **Works today**: `uv run ss14-autojoin status <address>`, `watch <address>` (poll and print) and `doctor`
-  (finds the launcher install); no joining yet.
+  about 6 s). Install has `bin_x64` and `dotnet_x64`.
+* **Waiting on Jacob**: `doctor` output and the first end-to-end `join` run (`docs/handoff.md`, items 6 and 7).
+* **Works today** (Linux-tested): `status`, `watch`, `doctor`, and `join <address>` (the full loop, real
+  adapters untested on Windows).
 
 ## Stack and commands
 
@@ -41,6 +41,8 @@ uv run pytest                                          # tests (must pass before
 uv run ruff check --fix . && uv run ruff format .      # lint and format (CI runs both in check mode)
 uv run ss14-autojoin status ss14://host[:port]         # one status fetch
 uv run ss14-autojoin watch ss14://host --interval 3    # poll and print slot changes
+uv run ss14-autojoin doctor                            # where the launcher and its logs are
+uv run ss14-autojoin join ss14s://host/path --verbose  # the auto-join loop (Windows)
 ```
 
 If `uv python install 3.14` offers only a release candidate, the container's uv is stale: `python3 -m pip
@@ -52,8 +54,9 @@ install --user --upgrade uv` puts a current uv in `~/.local/bin` (that is what h
 CLAUDE.md                 this file
 README.md                 what it is, status, how to run
 pyproject.toml, uv.lock   project and pins (lock is committed)
-src/ss14_autojoin/        server.py (addresses, /status), launcher.py (install discovery), cli.py; later
-                          watcher.py, client.py, joiner.py, config.py, notify.py, app.py (Tkinter settings window)
+src/ss14_autojoin/        server.py (addresses, /status), launcher.py (install discovery), client.py (log
+                          parsing, tails), joiner.py (state machine, injected ports), runtime.py (real ports),
+                          cli.py; later config.py, notify.py, app.py (Tkinter settings window)
 tests/                    pytest; fake HTTP server, fixture logs under docs/fixtures/
 docs/                     plan.md, ss14-launcher-reference.md, decisions.md, handoff.md, project-log.md,
                           fixtures/ (real logs from Jacob's machine, redacted)

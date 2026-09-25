@@ -73,3 +73,14 @@ Dated entries, newest last. Numbers where there are numbers.
   has `Launcher command: ...` lines for pipe/command-line connects. Fixture `launcher.log` extended.
 * Consequence: no "launcher must be running" precondition; restarting a stuck launcher with the URI is a
   clean recovery.
+
+## 2026-09-26 (night): M2 code complete, untested on Windows
+
+* `client.py`: client log parsing (`ClientLogState`, `DenyReason` with escaped-JSON decoding), launcher log
+  events with timestamps, `LogTail` (growth, recreation, partial lines) and `LauncherLogTail` (daily roll).
+  Verified against all four fixtures: joined, truncated-while-open, full-after-exit, launcher log.
+* `joiner.py`: the state machine with injected ports; 9 scripted scenarios (slot opens, full then join,
+  timeout with post-mortem ban stops, unknown failures cap, no client appears, dropped command with and
+  without restart, offline back-off and max attempts, panic bunker filter and stop, rejoin after kick).
+* `runtime.py`: real ports (subprocess for the launcher command with `DOTNET_ROOT`, psutil for the client
+  process, the two log tails). `join` CLI command wired. 76 tests pass. Hand-off item 7 is the first real run.

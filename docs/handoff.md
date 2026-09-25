@@ -21,9 +21,21 @@ the repository (`docs/fixtures/`) or the session, and tick the item. Nothing els
 ## Later (M2, M3)
 
 6. Run `uv run ss14-autojoin doctor` on Windows and paste the output (it exists now: detected install, runtime folder, log paths).
-7. First end-to-end run: `uv run ss14-autojoin join ss14://<server>` while the server is full. Success: the
-   tool logs each poll, launches when a slot appears, and either reports "joined" or cleans up and resumes.
-   Paste the tool's log.
+7. **First end-to-end run (ready to try).** In the repository folder on Windows:
+
+   ```powershell
+   uv sync --all-groups
+   uv run ss14-autojoin doctor
+   uv run ss14-autojoin join ss14s://lizard.spacestation14.io/server --verbose
+   ```
+
+   The tool polls Lizard every 3 s, prints a line when the player count or slot state changes, and when a slot
+   is free runs `bin_x64\SS14.Launcher.exe <uri>`. It then waits for the client PID in the launcher log, reads
+   `client.stdout.log` for the join, and on a "server is full" denial (or 45 s without a join) closes the
+   client with `terminate`, reads the reason once the log flushes, waits 2 s and watches again. Success is a
+   `joined` line and exit code 0. Paste the whole console output, joined or not; the interesting cases are a
+   wrong PID, a client left open, or an attempt that never sees the join although you are in the game.
+   Useful flags: `--max-attempts 3` for a bounded test, `--rejoin`, `--restart-launcher`.
 8. Named pipe test (optional optimisation): `uv run ss14-autojoin doctor --pipe-test` when it exists. Success:
    the launcher window activates (`:Ping`).
 9. Build the Windows binary with `uv run python build.py` if CI's `windows-latest` job is not used, and run

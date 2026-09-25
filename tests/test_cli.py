@@ -71,3 +71,22 @@ def test_doctor_reports_install(tmp_path, capsys: pytest.CaptureFixture[str], mo
     assert f"launcher install:  {root} (standalone, found via configured)" in out
     assert "loader exe:        missing" in out
     assert main(["doctor", "--launcher", str(tmp_path / "nothing")]) == EXIT_UNREACHABLE
+
+
+def test_join_without_launcher_fails_cleanly(
+    tmp_path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("ss14_autojoin.cli.running_launcher_exes", list)
+    monkeypatch.setattr("ss14_autojoin.cli.find_launcher", lambda *a, **k: None)
+    assert main(["join", "ss14://host", "--launcher", str(tmp_path)]) == EXIT_UNREACHABLE
+    assert "launcher installation not found" in capsys.readouterr().err
+
+
+def test_launcher_command_sets_dotnet_root(tmp_path) -> None:
+    from ss14_autojoin.launcher import LauncherInstall
+    from ss14_autojoin.runtime import launcher_command
+
+    install = LauncherInstall(tmp_path, tmp_path / "bin_x64" / "x.exe", None, tmp_path / "dotnet_x64", "t", "steam")
+    argv, env = launcher_command(install, "ss14s://lizard.spacestation14.io/server")
+    assert argv == [str(tmp_path / "bin_x64" / "x.exe"), "ss14s://lizard.spacestation14.io/server"]
+    assert env["DOTNET_ROOT"] == str(tmp_path / "dotnet_x64")

@@ -4,8 +4,9 @@ Watches a [Space Station 14](https://spacestation14.com/) server and, the moment
 the official launcher connect, exactly as the Connect button would. If the join fails (someone else took the
 slot), it closes the failed game client and goes back to watching until you are in.
 
-**Status (2026-09-25):** research and design done, project scaffolded. Today the tool can fetch and watch a
-server's status; launching through the launcher is the next milestone. See `docs/plan.md` for the design and
+**Status (2026-09-26):** the full loop exists (`join`): watch the server, connect through the launcher when a
+slot is free, verify from the client log, close a rejected client and try again. Verified piecewise on Jacob's
+machine and with fixtures; the first end-to-end run on Windows is pending. See `docs/plan.md` for the design and
 `docs/handoff.md` for what still needs a Windows machine.
 
 ## Run
@@ -18,13 +19,15 @@ uv run ss14-autojoin status ss14://server.example.org        # one status fetch 
 uv run ss14-autojoin status ss14://server.example.org --json
 uv run ss14-autojoin watch  ss14://server.example.org --interval 3   # print whenever the slot situation changes
 uv run ss14-autojoin doctor                                          # find the launcher install and its data folders
+uv run ss14-autojoin join ss14s://lizard.spacestation14.io/server --verbose   # the auto-join loop
 uv run pytest
 ```
 
 ## Layout
 
 * `src/ss14_autojoin/` the code: `server.py` (addresses, `/status`), `launcher.py` (finding the install),
-  `cli.py`. Coming: `watcher.py`, `client.py`, `joiner.py`, `config.py`, `app.py`.
+  `client.py` (reading the client and launcher logs), `joiner.py` (the loop, with injected ports),
+  `runtime.py` (real processes and files), `cli.py`. Coming: `config.py`, `app.py` (settings window).
 * `tests/` pytest, with a local fake status server.
 * `docs/` `plan.md`, `ss14-launcher-reference.md` (verified facts about the launcher, engine and content),
   `decisions.md`, `handoff.md`, `project-log.md`.
