@@ -31,3 +31,11 @@ Dated entries, newest last. Numbers where there are numbers.
   new hand-off item 3).
 * Checked and ruled out: `SS14_LOG_CLIENT` (unused by the engine), `log.*` cvars (server only), client
   `--loglevel`/`--cvar` flags (only the launcher builds the client command line). Root level is already Debug.
+
+## 2026-09-25 (later still): the denial, seen
+
+* Jacob repeated the full-server attempt and copied the log after pressing Exit
+  (`docs/fixtures/client.stdout.full-after-exit.log`). The buffer is flushed on client exit. The denial arrives
+  during the handshake: `Status changed to Disconnected, reason: "{\"reason\":\"Connect denied: The server is
+  full!\",\"redial\":false,\"delay\":30}"`, then `Runlevel changed to: Initialize` and an `[ERRO] net: Exception
+  during handshake` line with the same JSON. The parser in M2 has real text for both outcomes.

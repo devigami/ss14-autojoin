@@ -19,13 +19,9 @@ the repository (`docs/fixtures/`) or the session, and tick the item. Nothing els
    Success: the console prints `Passed commands to primary launcher`, the launcher window comes to the front
    and starts connecting. Then quit the launcher and run the same command again: it should start the launcher
    and connect once the account is logged in. Note anything different.
-3. ~~Capture a failed attempt~~ **Done 2026-09-25** (`docs/fixtures/client.stdout.full.log`), with a twist: the
-   file stopped before the connect lines because the launcher had not flushed its buffer. **Follow-up:** after
-   the game shows "The server is full!", close the game client (Exit button), wait 10 s, and copy
-   `client.stdout.log` again as `docs/fixtures/client.stdout.full-after-exit.log`. Success: the file now ends
-   with `net:` lines including the denial reason. If it still ends at `LauncherConnecting`, say so: the tool
-   then cannot classify failures from the log at all. Also copy the day's `launcher-YYYYMMDD.log` lines for
-   that attempt to `docs/fixtures/launcher.full.log`.
+3. ~~Capture a failed attempt~~ **Done 2026-09-25**, twice: `client.stdout.full.log` (copied while the client
+   was open, truncated by the launcher's buffer) and `client.stdout.full-after-exit.log` (complete, with the
+   denial). Still wanted from one attempt: the day's `launcher-YYYYMMDD.log` lines, as `docs/fixtures/launcher.full.log`.
 4. ~~Capture a successful attempt~~ **Done 2026-09-25** (`docs/fixtures/client.stdout.joined.log`).
 5. **Target server.** The `ss14://` address (or the exact server name as the launcher shows it) of the server
    to auto-join, and whether it runs a whitelist or panic bunker.

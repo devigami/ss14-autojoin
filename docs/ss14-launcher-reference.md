@@ -235,10 +235,22 @@ Windows from Jacob's logs (2026-09-25, `docs/fixtures/client.stdout.joined.log`)
 Endpoints and reasons are printed in double quotes. With both IPv6 and IPv4 resolved, the losing address logs a
 `Disconnected, reason: "Connection attempt failed"` even on success, so a `Disconnected` line alone is not a
 failure: the failure signature is a `Disconnected` for the **winning** endpoint (or for every endpoint) before
-`Handshake completed`. Expected but **not yet seen in a real log**: a server denial as
-`Status changed to Disconnected, reason: "Disconnected: {"reason":"The server is full!","redial":false,"delay":30}"`
-(the JSON from section 5, possibly with escaped quotes), then no further `net:` lines, or
-`[ERRO] net: Exception during handshake: ...` for a failure after the Lidgren connect.
+`Handshake completed`. **Verified on Windows (`docs/fixtures/client.stdout.full-after-exit.log`)**, a "server full" denial reads:
+
+```
+[DEBG] net: "51.81.194.242:1212": Status changed to Connected, reason: "Connected to A3D487E1101CB242"
+[DEBG] net: "[2604:2dc0:20f:702::10]:1212": Status changed to Disconnected, reason: "Connection attempt failed"
+[DEBG] net: "51.81.194.242:1212": Status changed to Disconnected, reason: "{\"reason\":\"Connect denied: The server is full!\",\"redial\":false,\"delay\":30}"
+[DEBG] client: Runlevel changed to: Initialize
+[ERRO] net: Exception during handshake: Robust.Shared.Network.NetManager+ClientDisconnectedException: Disconnected: {"reason":"Connect denied: The server is full!","redial":false,"delay":30}
+```
+
+So the Lidgren connection is accepted first and the denial arrives during the engine handshake (the server's
+approval step), as a `Disconnected` whose reason is the JSON of section 5 with the quotes backslash-escaped,
+and the message prefixed `Connect denied: `. Three distinct failure markers follow within milliseconds:
+that `Disconnected` for the winning endpoint, `Runlevel changed to: Initialize` (the client fell back out of
+`Connecting`), and the `[ERRO] net: Exception during handshake` line carrying the same JSON unescaped. After
+that the client is silent until the user presses Exit (`[INFO] game: Shutting down! Reason: Exit button pressed`).
 
 **The file lags behind the client (verified in `Connector.PipeOutput`, and in
 `docs/fixtures/client.stdout.full.log`).** The launcher reads the client's stdout pipe in 4096-byte chunks and
@@ -246,8 +258,9 @@ writes them to a `FileStream` opened with a 4096-byte buffer, never calling `Flu
 that buffer fills. A client sitting on "The server is full!" prints almost nothing more, so its connect and
 failure lines can stay in memory indefinitely: Jacob's copy of the log, taken while the client showed the
 failure, ends at `Switching to state Content.Client.Launcher.LauncherConnecting`. On client exit the pipe
-reaches EOF and the read loop returns without disposing the stream; whether the finalizer flushes the buffer
-later is **unverified**. During a successful join the game keeps logging, so the join lines appear within the
+reaches EOF and the read loop returns without disposing the stream, yet **the buffer does reach disk on exit**
+(verified: the same attempt copied after pressing Exit was complete). So a post-mortem read after closing the
+client sees the denial reason. During a successful join the game keeps logging, so the join lines appear within the
 next 4 KiB of output (seconds to a minute).
 
 **No way to make the client log elsewhere or more verbosely from outside.** `SS14_LOG_CLIENT` (set by the
@@ -307,7 +320,7 @@ Useful launcher log lines: `Connect command: "<uri>", "<reason>"`, `Dropping con
 * Whether `players` in `/status` counts players still in the handshake (it uses `PlayerCount`, which counts
   sessions; sessions are created at approval time, so probably yes, but not read).
 * Any engine-side rate limit on repeated connection attempts from one address.
-* Whether the launcher's log `FileStream` is flushed when the client exits (finalizer) so a post-mortem read of
-  `client.stdout.log` sees the denial reason; and the exact text of a "server full" denial in the log.
+* How long after client exit the flushed log is complete (Jacob copied it some seconds later; the tool should
+  poll the file for the `Goodbye` line or give it a few seconds).
 * Whether `PipeOptions.CurrentUserOnly` accepts a Python client on the same user account (it should; the
   fallback of invoking `bin_x64\SS14.Launcher.exe <uri>` avoids the question).

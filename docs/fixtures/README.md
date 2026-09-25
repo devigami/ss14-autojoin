@@ -13,5 +13,9 @@ everything else is verbatim.
   were still sitting in the launcher's unflushed 4 KiB write buffer (`Connector.PipeOutput`). This is the
   evidence that the log cannot be tailed in real time for failures; see the reference, section 10.
 
-Still wanted: the same `client.stdout.log` **after** the failed client has been closed (does the buffer get
-flushed on exit?), and the launcher log lines of one attempt (`launcher.full.log`).
+* `client.stdout.full-after-exit.log` (2026-09-25): a second "server is full" attempt, copied **after** pressing
+  Exit in the client. The buffer was flushed on exit: the denial arrives during the handshake as a Lidgren
+  `Disconnected` with the JSON reason `Connect denied: The server is full!` (delay 30), followed by
+  `Runlevel changed to: Initialize` and `[ERRO] net: Exception during handshake: ...ClientDisconnectedException`.
+
+Still wanted: the launcher log lines of one attempt (`launcher.full.log`).
