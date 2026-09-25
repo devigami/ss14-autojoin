@@ -17,3 +17,17 @@ Dated entries, newest last. Numbers where there are numbers.
 * Scaffold: `pyproject.toml` (uv, ruff, pytest), `src/ss14_autojoin/server.py` (address parsing with the
   launcher's four test vectors, status parsing, free-slot logic, status fetch), `cli.py` with `status` and
   `watch` (poll and print), tests, CI workflow, `CLAUDE.md`.
+
+## 2026-09-25 (later): first real logs from Windows
+
+* Jacob supplied `client.stdout.log` for a successful join to Lizard and for a "server is full" attempt
+  (`docs/fixtures/`, redacted). The success log confirms the line wording from the engine source, including
+  the quoted endpoints and the harmless `Disconnected, reason: "Connection attempt failed"` of the losing
+  IPv6/IPv4 candidate.
+* The failure log ends before any `net:` line. Cause found in `Connector.PipeOutput`: the launcher writes the
+  piped stdout into a `FileStream` with a 4 KiB buffer and never flushes, so a quiet failed client leaves its
+  failure lines in memory. Consequence for the design: failure is detected by the absence of the success
+  marker within a timeout, then the client is closed and the log read post-mortem (flush on exit unverified;
+  new hand-off item 3).
+* Checked and ruled out: `SS14_LOG_CLIENT` (unused by the engine), `log.*` cvars (server only), client
+  `--loglevel`/`--cvar` flags (only the launcher builds the client command line). Root level is already Debug.

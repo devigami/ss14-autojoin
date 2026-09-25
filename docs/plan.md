@@ -75,10 +75,10 @@ Rules:
 * **CONNECTING**: exactly one connect command per attempt. Before sending, make sure no `SS14.Loader` from a
   previous attempt is alive. Success of the *command* is a new `Connect command:` line in the launcher log
   or a client PID; failure is `Dropping connect command` or no client within 20 s.
-* **VERIFYING**: tail the new `client.stdout.log`. Joined = handshake completed. Failed = a `Disconnected`
-  status before the handshake completed, or an `Exception during handshake`, or nothing within the attempt
-  timeout (default 90 s, generous for a content download on first connect; the `Updating` phase is visible in
-  the launcher log and can extend it).
+* **VERIFYING**: tail the new `client.stdout.log`. Joined = `Handshake completed, connection established.` or
+  `Runlevel changed to: Connected`. Failed = a `Disconnected` for the winning endpoint before the handshake, an
+  `Exception during handshake`, or (the usual case, because the file lags) no success marker within the attempt
+  timeout (first estimate 45 s from the client PID; 90 s while the launcher log shows `Updating`).
 * **FAILED**: terminate the client (`psutil` terminate, then kill after 5 s), confirm it is gone, wait
   `cooldown` (default 2 s), return to WATCHING. Log the reason. If the reason is not "full" (ban, whitelist,
   panic bunker, version mismatch), stop and tell the user: retrying will not help.
@@ -93,10 +93,18 @@ Rules:
 
 | Signal | Reliability | Latency | Used for |
 |---|---|---|---|
-| `client.stdout.log` lines (§10) | high: the client logs each connection phase; failure carries the server's reason | seconds (file flush) | primary outcome detection |
-| launcher log (`Connect command`, `PID`, `Dropping`, `Failed to connect: ConnectionFailed`/`UpdateError`) | high | seconds | command accepted, client PID, stuck detection, launcher-side failures |
+| `client.stdout.log` lines (reference §10) | high wording-wise, **but the file lags up to 4 KiB of output behind the client**: a failed client goes quiet and its failure lines may never reach disk while it lives | seconds during a join; unbounded after a failure | success detection (the join keeps logging); post-mortem classification of a failure after the client is closed |
+| absence of the success marker within the attempt timeout, client still alive | good once the timeout is calibrated from real joins (Jacob's join reached `InGame` within one client start-up) | the timeout | **primary failure detection** |
+| launcher log (`Connect command`, `PID`, `Dropping`, `Failed to connect: ConnectionFailed`/`UpdateError`) | high | seconds (Serilog file sink) | command accepted, client PID, stuck detection, launcher-side failures |
 | `SS14.Loader` process alive | high for "client exists", says nothing about the join | immediate | cleanup and sanity checks |
 | `/status` players count rising after the attempt | weak (others join too; admins excluded; polling lag) | 3 to 5 s | corroboration only, never a decision |
+
+Revised on 2026-09-25 after Jacob's logs (`docs/fixtures/`): VERIFYING treats "no `Handshake completed` /
+`Runlevel changed to: Connected` within the attempt timeout" as the failure, terminates the client, then reads
+the log once more (it may flush on exit) to classify the reason. When no reason can be read, the attempt counts
+as "full" and the loop continues, with a cap on consecutive unclassified failures so a real ban or whitelist
+denial cannot loop forever. The attempt timeout starts when the client PID appears and should be set from
+measured start-up-to-`InGame` times (first estimate 45 s, 90 s while the launcher log shows `Updating`).
 
 ## Cloud versus Windows
 

@@ -14,8 +14,11 @@ general SS14 notes and the conventions this project follows; clone it when you n
 * **Milestone**: M0 done on 2026-09-25 (research, plan, scaffold, `server.py` with tests, CI). Next: M1
   (`watcher.py`, fixtures, back-off) and, once Jacob's fixtures arrive, M2 (`launcher.py`, `client.py`,
   `joiner.py`).
-* **Waiting on Jacob**: launcher install path, a failed and a successful `client.stdout.log`, the target
-  server address (`docs/handoff.md`, items 1 to 5).
+* **Have from Jacob (2026-09-25)**: a successful and a failed `client.stdout.log` (`docs/fixtures/`). The
+  failed one revealed that the launcher does not flush the log while the client is quiet, so failure
+  detection is timeout-based (`docs/plan.md`, "Why this detection method").
+* **Waiting on Jacob**: launcher install path, the log after closing a failed client, launcher log lines, the
+  target server address (`docs/handoff.md`, items 1 to 5).
 * **Works today**: `uv run ss14-autojoin status <address>` and `watch <address>` (poll and print; no
   joining yet).
 

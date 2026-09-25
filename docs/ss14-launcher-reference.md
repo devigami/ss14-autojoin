@@ -209,30 +209,54 @@ Content `Content.Client/Entry/EntryPoint.cs`, `Content.Client/Launcher/LauncherC
 
 The engine's root log level is `Debug` (`Robust.Shared/Log/LogManager.cs`); the console handler writes
 `[LEVL] sawmill: message` with levels `VERB`, `DEBG`, `INFO`, `WARN`, `ERRO`, `FATL`, and ANSI colours only
-when stdout is a terminal (not when the launcher redirects it). The network sawmill is `net`. Lines in order
-for one attempt (`NetManager.ClientConnect.cs`, `NetManager.cs`):
+when stdout is a terminal (not when the launcher redirects it). The network sawmill is `net`. **Verified on
+Windows from Jacob's logs (2026-09-25, `docs/fixtures/client.stdout.joined.log`)**, a successful join reads:
 
 ```
-[DEBG] net: Attempting to connect to <host> port <port>
-[DEBG] net: First attempt IP address is <ip>, second attempt <ip or null>
-[DEBG] net: <endpoint>: Status changed to InitiatedConnect, reason: ...
-[DEBG] net: <endpoint>: Status changed to Connected, reason: ...           # Lidgren-level connection accepted
-[INFO] net: Client completed serializer handshake.
+[DEBG] root: Switching to state Content.Client.Launcher.LauncherConnecting
+[DEBG] client: Runlevel changed to: Connecting
+[DEBG] net: Attempting to connect to lizard.spacestation14.com port 1212
+[DEBG] net: First attempt IP address is 2604:2dc0:20f:702::10, second attempt 51.81.194.242
+[DEBG] net: "[2604:2dc0:20f:702::10]:1212": Status changed to InitiatedConnect, reason: "user called connect"
+[DEBG] net: "51.81.194.242:1212": Status changed to InitiatedConnect, reason: "user called connect"
+[DEBG] net: "51.81.194.242:1212": Status changed to Connected, reason: "Connected to B271BE2085868A7C"
+[DEBG] net: "[2604:2dc0:20f:702::10]:1212": Status changed to Disconnected, reason: "Connection attempt failed"
+[DEBG] net: Handshake completed, connection established.
+[INFO] net: Received message name string table.
 [INFO] net: Client completed transfer handshake.
-[DEBG] net: Handshake completed, connection established.                  # joined
+[INFO] net: Client completed serializer handshake.
+[INFO] player: Changing local session from null to <username>.
+[DEBG] client: Runlevel changed to: Connected
+[INFO] state: Received Full GameState: to=493, sz=695
+[DEBG] client: Runlevel changed to: InGame
+[DEBG] root: Switching to state Content.Client.Lobby.LobbyState
 ```
 
-Failure signatures:
+Endpoints and reasons are printed in double quotes. With both IPv6 and IPv4 resolved, the losing address logs a
+`Disconnected, reason: "Connection attempt failed"` even on success, so a `Disconnected` line alone is not a
+failure: the failure signature is a `Disconnected` for the **winning** endpoint (or for every endpoint) before
+`Handshake completed`. Expected but **not yet seen in a real log**: a server denial as
+`Status changed to Disconnected, reason: "Disconnected: {"reason":"The server is full!","redial":false,"delay":30}"`
+(the JSON from section 5, possibly with escaped quotes), then no further `net:` lines, or
+`[ERRO] net: Exception during handshake: ...` for a failure after the Lidgren connect.
 
-```
-[DEBG] net: <endpoint>: Status changed to Disconnected, reason: Disconnected: {"reason":"The server is full!","redial":false,"delay":30}
-[ERRO] net: Exception during handshake: ...                               # failure after the Lidgren connect
-[INFO] net: <endpoint>: Disconnected (<reason>)                           # a later disconnect from an established connection
-```
+**The file lags behind the client (verified in `Connector.PipeOutput`, and in
+`docs/fixtures/client.stdout.full.log`).** The launcher reads the client's stdout pipe in 4096-byte chunks and
+writes them to a `FileStream` opened with a 4096-byte buffer, never calling `Flush`. Bytes reach disk only when
+that buffer fills. A client sitting on "The server is full!" prints almost nothing more, so its connect and
+failure lines can stay in memory indefinitely: Jacob's copy of the log, taken while the client showed the
+failure, ends at `Switching to state Content.Client.Launcher.LauncherConnecting`. On client exit the pipe
+reaches EOF and the read loop returns without disposing the stream; whether the finalizer flushes the buffer
+later is **unverified**. During a successful join the game keeps logging, so the join lines appear within the
+next 4 KiB of output (seconds to a minute).
 
-`launcher-ui` is the content's sawmill for redial messages. The exact Windows wording (message templates are
-rendered with `{0}`-style and `{Name}`-style placeholders) is to be confirmed from a real `client.stdout.log`;
-see `handoff.md`.
+**No way to make the client log elsewhere or more verbosely from outside.** `SS14_LOG_CLIENT` (set by the
+launcher on macOS only) is read by nothing in the engine checkout; the `log.enabled`, `log.path`,
+`log.format`, `log.level` cvars are `SERVERONLY` (`Robust.Shared/CVars.cs`); the client does accept
+`--loglevel <sawmill>=<Level>` and `--cvar` on its command line (`Robust.Client/CommandLineArgs.cs`), but the
+launcher builds that command line (section 8) and the root level is already `Debug`. The launcher's own
+`LogLauncherVerbose` cvar affects the launcher log only. The client does load `client_config.toml`
+("Configuration loaded from file"), which could carry client cvars, but none redirects or flushes the log.
 
 ## 11. Windows install layout and data directories
 
@@ -283,7 +307,7 @@ Useful launcher log lines: `Connect command: "<uri>", "<reason>"`, `Dropping con
 * Whether `players` in `/status` counts players still in the handshake (it uses `PlayerCount`, which counts
   sessions; sessions are created at approval time, so probably yes, but not read).
 * Any engine-side rate limit on repeated connection attempts from one address.
-* The exact wording of the log lines on Windows and whether `client.stdout.log` is flushed promptly enough to
-  tail (the launcher pipes with a 4 KiB async `FileStream`).
+* Whether the launcher's log `FileStream` is flushed when the client exits (finalizer) so a post-mortem read of
+  `client.stdout.log` sees the denial reason; and the exact text of a "server full" denial in the log.
 * Whether `PipeOptions.CurrentUserOnly` accepts a Python client on the same user account (it should; the
   fallback of invoking `bin_x64\SS14.Launcher.exe <uri>` avoids the question).
