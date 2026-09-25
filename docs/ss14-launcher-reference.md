@@ -303,6 +303,34 @@ Useful launcher log lines: `Connect command: "<uri>", "<reason>"`, `Dropping con
 `Setting up manual-pipe logging for new client with PID <pid>`, `Passed commands to primary launcher` and
 `We are primary launcher (or primary launcher is out for lunch)` (the last two go to the console only).
 
+## 11a. Jacob's actual installation (from `docs/fixtures/launcher.log`, 2026-09-26)
+
+* **Steam build**, launcher version 0.40.1.0, installed at
+  `D:\SteamLibrary\steamapps\common\Space Station 14 Playtest\` with the same layout as the standalone zip:
+  `bin_x64\`, `bin_x64\loader\SS14.Loader.exe`, `bin_x64\signing_key`. The client gets one extra argument,
+  `--cvar branding.steam=true`. The log lines match the open-source launcher code line for line, so the Steam
+  fork is the same code plus Steam bits (`ConfigureMultiWindow` says "implemented in private repo for Steam").
+  **Unverified**: whether `bin_x64\SS14.Launcher.exe <uri>` and the named pipe work in the Steam build, and
+  whether Steam must be running for the launcher to start (hand-off item 2).
+* Data directories are the standard ones: engines under
+  `C:\Users\jacob\AppData\Roaming\Space Station 14\launcher\engines\290.0.0.zip`.
+* **Wizard's Den Lizard** is favourited as `ss14s://lizard.spacestation14.io/server`: status at
+  `https://lizard.spacestation14.io/server/status`, game traffic to `udp://lizard.spacestation14.com/`
+  (port 1212). Leviathan (`leviathan.spacestation14.com`) is the other favourite. Fork `wizards-testing`,
+  engine Robust 290.0.0.
+* **Launcher log format** (Serilog): `2026-09-26 08:45:25.646 +10:00 [DBG] message`, levels `INF`, `DBG`,
+  `WRN`, `ERR`, local time with offset. Lines that matter, in order for one attempt:
+  `User has previously accepted privacy policy ...` (the `/info` fetch succeeded) → `Checking to see if we
+  already have version for fork ...` → `Found matching version: N` or `Did not find matching version` +
+  download lines → `Update done!` → `Launch command: <loader exe> [0] ... [15] <ss14 address> ...` →
+  `Setting up manual-pipe logging for new client with PID <pid>.` → later `EOF, ending pipe logging for <pid>.`
+  twice (stdout and stderr) when the client exits. A connect started from the UI writes **no** `Connect command`
+  line; only command-line or pipe connects do (`LauncherCommands.Connect`). The favourites and hub refresh
+  every few minutes as `Seeking connection to Unspecified/<host>:443` lines.
+* **Measured timings**: `/info` accepted to `Launch command` took 8.2 s with a content update (39 blobs) and
+  1.6 s with the version cached (the engine manifest check against `robust-builds.cdn` is the 1.5 s). Client
+  start to denial is not timestamped in the client log; the failed client lived 61 s until Jacob pressed Exit.
+
 ## 12. Timing constants
 
 | What | Value | Where |

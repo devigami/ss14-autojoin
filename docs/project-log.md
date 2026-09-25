@@ -39,3 +39,15 @@ Dated entries, newest last. Numbers where there are numbers.
   during the handshake: `Status changed to Disconnected, reason: "{\"reason\":\"Connect denied: The server is
   full!\",\"redial\":false,\"delay\":30}"`, then `Runlevel changed to: Initialize` and an `[ERRO] net: Exception
   during handshake` line with the same JSON. The parser in M2 has real text for both outcomes.
+
+## 2026-09-26: the launcher log
+
+* Jacob's launcher log (`docs/fixtures/launcher.log`) shows a **Steam** launcher, 0.40.1.0, at
+  `D:\SteamLibrary\steamapps\common\Space Station 14 Playtest`, same layout as the standalone zip, client
+  gets `--cvar branding.steam=true`. Target server confirmed as Lizard, address
+  `ss14s://lizard.spacestation14.io/server` (status URL `https://lizard.spacestation14.io/server/status`).
+* The launcher log has timestamps, the client PID (`Setting up manual-pipe logging for new client with PID`)
+  and the client's exit (`EOF, ending pipe logging`), so it is the clock for the attempt timeout. Update with a
+  cached version takes 1.6 s, with a content download 8.2 s (39 blobs).
+* Decision: proceed with the Steam build; hand-off item 2 (command-line connect) is now the gating test.
+* Added the Lizard address to the `server.py` test vectors.

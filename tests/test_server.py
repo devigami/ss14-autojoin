@@ -21,6 +21,8 @@ LAUNCHER_VECTORS = [
     ("ss14s://server.spacestation14.io", "https://server.spacestation14.io/status"),
     ("ss14s://server.spacestation14.io:1212", "https://server.spacestation14.io:1212/status"),
     ("ss14s://server.spacestation14.io/foo", "https://server.spacestation14.io/foo/status"),
+    # Wizard's Den Lizard as the launcher stores it (Jacob's launcher log, 2026-09-26).
+    ("ss14s://lizard.spacestation14.io/server", "https://lizard.spacestation14.io/server/status"),
 ]
 
 

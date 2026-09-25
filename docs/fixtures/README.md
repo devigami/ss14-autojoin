@@ -18,4 +18,6 @@ everything else is verbatim.
   `Disconnected` with the JSON reason `Connect denied: The server is full!` (delay 30), followed by
   `Runlevel changed to: Initialize` and `[ERRO] net: Exception during handshake: ...ClientDisconnectedException`.
 
-Still wanted: the launcher log lines of one attempt (`launcher.full.log`).
+* `launcher.log` (2026-09-26, launcher 0.40.1.0, **Steam build**): the launcher's own log around the successful
+  join (client PID 7136, 08:45 to 09:04) and the failed one (PID 26840, 09:05:27 to 09:06:28). Trimmed of repeated
+  hub and favourite refresh lines and of the migration noise; account id replaced with zeros.

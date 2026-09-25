@@ -5,10 +5,9 @@ the repository (`docs/fixtures/`) or the session, and tick the item. Nothing els
 
 ## Now (unblocks M2)
 
-1. **Launcher install path.** Find the folder that holds `Space Station 14 Launcher.exe`, `bin_x64\` and
-   `dotnet_x64\` (the standalone launcher zip's contents). Record the full path in `docs/decisions.md` or pass
-   it to the tool with `--launcher <path>`. If the launcher was installed through Steam instead, stop and say
-   so: the Steam build is different code and the plan needs a new look.
+1. ~~Launcher install path~~ **Known from the launcher log (2026-09-26)**:
+   `D:\SteamLibrary\steamapps\common\Space Station 14 Playtest\` (Steam build 0.40.1.0). Please confirm it
+   contains `bin_x64\SS14.Launcher.exe` and a `dotnet_x64\` folder (`dir` of that folder is enough).
 2. **Connect by command line.** With the launcher running and logged in, in PowerShell:
 
    ```powershell
@@ -16,15 +15,18 @@ the repository (`docs/fixtures/`) or the session, and tick the item. Nothing els
    & "<install>\bin_x64\SS14.Launcher.exe" "ss14://<target server>"
    ```
 
-   Success: the console prints `Passed commands to primary launcher`, the launcher window comes to the front
-   and starts connecting. Then quit the launcher and run the same command again: it should start the launcher
-   and connect once the account is logged in. Note anything different.
+   with `<install>` = `D:\SteamLibrary\steamapps\common\Space Station 14 Playtest` and the target
+   `ss14s://lizard.spacestation14.io/server`. Success: the console prints `Passed commands to primary
+   launcher`, the launcher window comes to the front and starts connecting, and the launcher log gains a
+   `Connect command: "ss14s://lizard.spacestation14.io/server", ""` line. Then quit the launcher and run the
+   same command again: it should start the launcher (Steam may need to be running) and connect once the
+   account is logged in. **This is the one test that decides whether the Steam build can be driven at all.**
 3. ~~Capture a failed attempt~~ **Done 2026-09-25**, twice: `client.stdout.full.log` (copied while the client
    was open, truncated by the launcher's buffer) and `client.stdout.full-after-exit.log` (complete, with the
-   denial). Still wanted from one attempt: the day's `launcher-YYYYMMDD.log` lines, as `docs/fixtures/launcher.full.log`.
+   denial). Launcher log received too (`docs/fixtures/launcher.log`).
 4. ~~Capture a successful attempt~~ **Done 2026-09-25** (`docs/fixtures/client.stdout.joined.log`).
-5. **Target server.** The `ss14://` address (or the exact server name as the launcher shows it) of the server
-   to auto-join, and whether it runs a whitelist or panic bunker.
+5. ~~Target server~~ **Lizard, `ss14s://lizard.spacestation14.io/server`** (from the launcher log). Say if it
+   should be Leviathan or another server instead, and whether the target runs a whitelist or panic bunker.
 
 ## Later (M2, M3)
 

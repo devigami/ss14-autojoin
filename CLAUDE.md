@@ -17,8 +17,10 @@ general SS14 notes and the conventions this project follows; clone it when you n
 * **Have from Jacob (2026-09-25)**: a successful and a failed `client.stdout.log` (`docs/fixtures/`). The
   failed one revealed that the launcher does not flush the log while the client is quiet, so failure
   detection is timeout-based (`docs/plan.md`, "Why this detection method").
-* **Waiting on Jacob**: launcher install path, launcher log lines of one attempt, the target server address
-  (`docs/handoff.md`, items 1, 3, 5). Failure log after exit is in (`client.stdout.full-after-exit.log`).
+* **Known (2026-09-26)**: Steam launcher 0.40.1.0 at `D:\SteamLibrary\steamapps\common\Space Station 14
+  Playtest`; target Lizard `ss14s://lizard.spacestation14.io/server`; all four fixtures in `docs/fixtures/`.
+* **Waiting on Jacob**: hand-off item 2, the command-line connect test on the Steam build. It decides
+  whether the launcher can be driven from outside at all.
 * **Works today**: `uv run ss14-autojoin status <address>` and `watch <address>` (poll and print; no
   joining yet).
 
