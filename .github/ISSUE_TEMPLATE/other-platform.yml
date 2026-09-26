@@ -1,0 +1,36 @@
+name: Linux or macOS report
+description: You tried the tool outside Windows. Whether it worked or not, this is useful.
+title: "[Platform] "
+labels: [platform]
+body:
+  - type: markdown
+    attributes:
+      value: Only Windows has been tested. A report of success is as valuable as a bug here.
+  - type: input
+    id: os
+    attributes:
+      label: Operating system, version, desktop
+      placeholder: Ubuntu 24.04, GNOME; or macOS 15
+    validations:
+      required: true
+  - type: dropdown
+    id: launcher
+    attributes:
+      label: How the launcher is installed
+      options: [Steam, Flatpak, Distribution package, Tarball / zip from spacestation14.com, Other]
+    validations:
+      required: true
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result
+      options: [Joined a server successfully, Launcher not found, Connected but join not detected, Crash or error, Other]
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Tool log and `ss14-autojoin doctor` output
+      render: text
+    validations:
+      required: true

@@ -1,0 +1,15 @@
+# Categories for the release notes GitHub generates from merged pull requests (label your PRs).
+changelog:
+  exclude:
+    labels: [skip-changelog]
+  categories:
+    - title: Breaking changes
+      labels: [breaking]
+    - title: New features
+      labels: [enhancement, feature]
+    - title: Fixes
+      labels: [bug, fix]
+    - title: Documentation
+      labels: [documentation]
+    - title: Other changes
+      labels: ["*"]

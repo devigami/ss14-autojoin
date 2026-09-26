@@ -1,0 +1,116 @@
+[DEBG] root: OS: Microsoft Windows 10.0.26200 X64
+[DEBG] root: .NET Runtime: .NET 10.0.0 win-x64
+[DEBG] root: Server GC: False
+[DEBG] root: Processor: 16x AMD Ryzen 7 7700X 8-Core Processor
+[DEBG] root: Available Memory: 63.75 GiB
+[DEBG] root: Architecture: X64
+[DEBG] root: Robust Version: 290.0.0.0
+[DEBG] root: Compile Options: FULL_RELEASE;RELEASE;EXCEPTION_TOLERANCE
+[DEBG] root: Intrinsics: X86Aes;Avx;Avx2;Avx512BW;Avx512BW.VL;Avx512CD;Avx512CD.VL;Avx512DQ;Avx512DQ.VL;Avx512F;Avx512F.VL;Avx512Vbmi;Avx512Vbmi.VL;Bmi1;Bmi2;Fma;Lzcnt;Pclmulqdq;Popcnt;Sse;Sse2;Sse3;Ssse3;Sse41;Sse42;X86Base
+[INFO] cfg: Configuration loaded from file
+[INFO] clyde.win.sdl3: [system] App name: SDL Application
+[INFO] clyde.win.sdl3: [system] App version: <unspecified>
+[INFO] clyde.win.sdl3: [system] App ID: <unspecified>
+[INFO] clyde.win.sdl3: [system] SDL revision: SDL-3.4.8-release-3.4.8
+[DEBG] clyde.win.sdl3: [system] SDL chose video backend 'windows'
+[DEBG] clyde.win: SDL3 initialized, version: 3.4.8, video driver: "windows"
+[DEBG] clyde.ogl: OpenGL Vendor: NVIDIA Corporation
+[DEBG] clyde.ogl: OpenGL Renderer: NVIDIA GeForce RTX 3080/PCIe/SSE2
+[DEBG] clyde.ogl: OpenGL Version: 3.3.0 NVIDIA 616.56
+[DEBG] clyde.ogl: OpenGL Extensions: GL_AMD_multi_draw_indirect GL_AMD_seamless_cubemap_per_texture (about 12 KB of extension names removed from the fixture)
+[DEBG] clyde.ogl: OpenGL capabilities:
+[DEBG] clyde.ogl:   khr_debug: True
+[DEBG] clyde.ogl:   sampler_objects: True
+[DEBG] clyde.ogl:   texture_swizzle: True
+[DEBG] clyde.ogl:   vertex_array_object: True
+[DEBG] clyde.ogl:   fence_sync: True
+[DEBG] clyde.ogl:   map_buffer: True
+[DEBG] clyde.ogl:   map_buffer_range: True
+[DEBG] clyde.ogl:   pixel_buffer_object: True
+[DEBG] clyde.ogl:   standard_derivatives: True
+[DEBG] clyde.ogl:   GLES: False
+[DEBG] clyde.ogl: Loading stock textures...
+[DEBG] clyde.ogl: Loading stock shaders...
+[DEBG] clyde.ogl: Creating various GL objects...
+[DEBG] clyde.ogl: Setting up RenderHandle...
+[DEBG] clyde.ogl: Setting viewport and rendering splash...
+[DEBG] clyde.oal: HRTF specifier count: 1
+[DEBG] clyde.oal: OpenAL Vendor: OpenAL Community
+[DEBG] clyde.oal: OpenAL Renderer: OpenAL Soft
+[DEBG] clyde.oal: OpenAL Version: 1.1 ALSOFT 1.24.3
+[DEBG] clyde.oal: HRTF status: Enabled
+[DEBG] font.system: Initializing system font manager implementation
+[DEBG] font.system: Done initializing system font manager in 00:00:00.0105223
+[DEBG] res.mod: ENABLING assembly load context
+[DEBG] res.mod: ENABLING sandboxing
+[DEBG] res.mod: Found module '/Assemblies/Content.Client.dll'
+[DEBG] res.mod: Found module '/Assemblies/Content.Shared.Database.dll'
+[DEBG] res.mod: Found module '/Assemblies/Content.Shared.dll'
+[DEBG] res.mod: LOADING modules
+[DEBG] res.typecheck: Robust directory not available
+[DEBG] res.typecheck: Checking assembly...
+[DEBG] res.typecheck: Checking assembly...
+[DEBG] res.typecheck: Checking assembly...
+[DEBG] res.typecheck: Content.Shared: Verifying IL...
+[DEBG] res.typecheck: Content.Client: Verifying IL...
+[DEBG] res.typecheck: Content.Shared.Database: Verifying IL...
+[DEBG] res.typecheck: Content.Shared.Database: Verified IL in 73.4203ms
+[DEBG] res.typecheck: References loaded... 600ms
+[DEBG] res.typecheck: Types... 603ms
+[DEBG] res.typecheck: Inheritance... 604ms
+[DEBG] res.typecheck: Unmanaged methods... 604ms
+[DEBG] res.typecheck: Type abuse... 604ms
+[DEBG] res.typecheck: Checked assembly in 608ms
+[DEBG] res.typecheck: Content.Client: Verified IL in 551.1976ms
+[DEBG] res.typecheck: References loaded... 797ms
+[DEBG] res.typecheck: Types... 798ms
+[DEBG] res.typecheck: Inheritance... 799ms
+[DEBG] res.typecheck: Content.Shared: Verified IL in 701.8821ms
+[DEBG] res.typecheck: Unmanaged methods... 804ms
+[DEBG] res.typecheck: Type abuse... 804ms
+[DEBG] res.typecheck: Checked assembly in 854ms
+[DEBG] res.typecheck: References loaded... 918ms
+[DEBG] res.typecheck: Types... 919ms
+[DEBG] res.typecheck: Inheritance... 929ms
+[DEBG] res.typecheck: Unmanaged methods... 929ms
+[DEBG] res.typecheck: Type abuse... 929ms
+[DEBG] res.typecheck: Checked assembly in 935ms
+[DEBG] res.mod: Verified assemblies in 945ms
+[DEBG] res.mod: Loading module: '/Assemblies/Content.Shared.Database.dll'
+[DEBG] res.mod: Loading module: '/Assemblies/Content.Shared.dll'
+[DEBG] res.mod: Loading module: '/Assemblies/Content.Client.dll'
+[DEBG] res.mod: DONE loading modules: 00:00:01.1796901
+[DEBG] serialization: Skipping registering data definition for type Content.Shared.DeviceLinking.DevicePortPrototype since it is abstract or an interface
+[DEBG] serialization: Skipping registering data definition for type Content.Shared.EntityConditions.EntityConditionEvent`1[T] since it is abstract or an interface
+[DEBG] serialization: Skipping registering data definition for type Content.Shared.Nutrition.EntitySystems.SatiationThresholds`1[T] since it is abstract or an interface
+[DEBG] res.preload: (Meta atlas 0) - cropped utilization: 97.95%, fill percentage: 62.50%
+[DEBG] res.preload: Preloaded 3129 RSIs into 1 Atlas(es?) (27 not atlassed, 0 errored) in 00:00:01.1565481
+[DEBG] res.preload: Preloading textures...
+[DEBG] res.preload: Preloaded 883 textures (0 errored, 27 skipped) in 00:00:00.0910954
+[INFO] szr: Serializer Types Hash: 33CE9F522729A98BB030DE8BA8E9D2D64526B589003DBCA7A67A7D68C6EB5745
+[WARN] proto: Registering an ignored prototype Content.Shared.Maps.GameMapPoolPrototype
+[WARN] proto: Registering an ignored prototype Content.Shared.Maps.GameMapPrototype
+[WARN] proto: Registering an ignored prototype Content.Shared.GameTicking.Prototypes.GamePresetPrototype
+[INFO] client: Tickrate changed to: 30 on tick 1
+[INFO] client: Tickrate changed to: 1 on tick 1
+[DEBG] client: Runlevel changed to: Initialize
+[DEBG] style: Initializing Stylesheets...
+[DEBG] style: Initialized 512 style rules in 00:00:00.0297021
+[DEBG] root: Switching to state Content.Client.Launcher.LauncherConnecting
+[DEBG] client: Runlevel changed to: Connecting
+[DEBG] net: Attempting to connect to lizard.spacestation14.com port 1212
+[DEBG] net: First attempt IP address is 2604:2dc0:20f:702::10, second attempt 51.81.194.242
+[DEBG] net: "[2604:2dc0:20f:702::10]:1212": Status changed to InitiatedConnect, reason: "user called connect"
+[DEBG] net: "51.81.194.242:1212": Status changed to InitiatedConnect, reason: "user called connect"
+[DEBG] net: "51.81.194.242:1212": Status changed to Connected, reason: "Connected to A3D487E1101CB242"
+[DEBG] net: "[2604:2dc0:20f:702::10]:1212": Status changed to Disconnected, reason: "Connection attempt failed"
+[DEBG] net: "51.81.194.242:1212": Status changed to Disconnected, reason: "{\"reason\":\"Connect denied: The server is full!\",\"redial\":false,\"delay\":30}"
+[DEBG] client: Runlevel changed to: Initialize
+[ERRO] net: Exception during handshake: Robust.Shared.Network.NetManager+ClientDisconnectedException: Disconnected: {"reason":"Connect denied: The server is full!","redial":false,"delay":30}
+   at Robust.Shared.Network.NetManager.CCDoHandshake(NetPeerData peer, NetConnection connection, String userNameRequest, CancellationToken cancel) in /home/runner/work/RobustToolbox/RobustToolbox/Robust.Shared/Network/NetManager.ClientConnect.cs:line 222
+   at Robust.Shared.Network.NetManager.ClientConnect(String host, Int32 port, String userNameRequest) in /home/runner/work/RobustToolbox/RobustToolbox/Robust.Shared/Network/NetManager.ClientConnect.cs:line 97
+[INFO] game: Shutting down! Reason: Exit button pressed
+[INFO] net: Resetting NetManager: Client shutting down
+[INFO] entity: Flushing entities. Entity count: 0
+[DEBG] clyde.win: Terminating SDL3
+[DEBG] game: Goodbye
