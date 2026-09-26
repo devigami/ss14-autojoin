@@ -15,8 +15,9 @@ general SS14 notes and the conventions this project follows; clone it when you n
   2026-09-26 (`launcher.py`, `client.py`, `joiner.py`, `runtime.py`, `join`). First Windows run: discovery,
   slot detection, connect, PID and termination worked; the join was missed because the client log never
   flushes while the client is quiet, and a live client was killed. Fixed with the UDP-socket witness and
-  keep-on-unknown; **second run joined Lizard end to end (2026-09-26 10:35). M2 verified.** Now M3:
-  `config.py`, Tkinter settings window (`app.py`), `build.py`, Windows CI artifact.
+  keep-on-unknown; **second run joined Lizard end to end (2026-09-26 10:35). M2 verified.** M3 code
+  complete the same day: `config.py`, `app.py` (window), `build.py`, Windows CI artifact; awaiting Jacob's
+  check of the window and the exe (hand-off items 9 and 10). Open: notifications, release `v0.1.0`.
 * **Have from Jacob (2026-09-25)**: a successful and a failed `client.stdout.log` (`docs/fixtures/`). The
   failed one revealed that the launcher does not flush the log while the client is quiet, so failure
   detection is timeout-based (`docs/plan.md`, "Why this detection method").
@@ -28,9 +29,9 @@ general SS14 notes and the conventions this project follows; clone it when you n
 * **Verified 2026-09-26 (evening)**: cold start with a URI works too (launcher starts, logs in, connects in
   about 6 s). Install has `bin_x64` and `dotnet_x64`.
 * **Verified 2026-09-26**: psutil sees the client's UDP socket on Windows (1 connected, 0 rejected).
-* **Waiting on Jacob**: nothing for M2; M3 items will be added to `docs/handoff.md` as they need a Windows check.
-* **Works today**: `status`, `watch`, `doctor` (Windows-verified), `join <address>` (Windows-run once, see
-  above), `probe` (socket signal check).
+* **Waiting on Jacob**: the window (`uv run ss14-autojoin gui`) and the CI-built exe (`docs/handoff.md`, 9, 10).
+* **Works today**: `status`, `watch`, `doctor`, `join`, `probe` (all Windows-verified), `gui` (Linux-built,
+  Windows check pending), `uv run python build.py [--cli]` (Linux console build verified).
 
 ## Stack and commands
 
@@ -46,6 +47,8 @@ uv run ss14-autojoin status ss14://host[:port]         # one status fetch
 uv run ss14-autojoin watch ss14://host --interval 3    # poll and print slot changes
 uv run ss14-autojoin doctor                            # where the launcher and its logs are
 uv run ss14-autojoin join ss14s://host/path --verbose  # the auto-join loop (Windows)
+uv run ss14-autojoin gui                               # the window
+uv run python build.py [--cli]                         # one-file exe into dist/ (window, or console tool)
 ```
 
 If `uv python install 3.14` offers only a release candidate, the container's uv is stale: `python3 -m pip
@@ -59,11 +62,13 @@ README.md                 what it is, status, how to run
 pyproject.toml, uv.lock   project and pins (lock is committed)
 src/ss14_autojoin/        server.py (addresses, /status), launcher.py (install discovery), client.py (log
                           parsing, tails), joiner.py (state machine, injected ports), runtime.py (real ports),
-                          cli.py; later config.py, notify.py, app.py (Tkinter settings window)
+                          config.py (TOML settings), app.py (Tkinter window), cli.py, gui_main.py and
+                          cli_main.py (PyInstaller entry scripts, imported by nothing); later notify.py
 tests/                    pytest; fake HTTP server, fixture logs under docs/fixtures/
 docs/                     plan.md, ss14-launcher-reference.md, decisions.md, handoff.md, project-log.md,
                           fixtures/ (real logs from Jacob's machine, redacted)
-.github/workflows/ci.yml  ruff + pytest on Linux and Windows; Windows exe job once build.py exists
+.github/workflows/ci.yml  ruff + pytest on Linux and Windows; windows-app builds both exes on push
+build.py                  PyInstaller --onefile builds
 ```
 
 ## Rules for this project

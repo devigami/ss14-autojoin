@@ -146,8 +146,10 @@ exists.
    ss14://<server>` on Windows and see slot changes.
 3. **M2, join**: `launcher.py`, `client.py`, `joiner.py`, `cli.py join|doctor`, fixture logs from Jacob. First
    end-to-end join on Windows.
-4. **M3, app**: `config.py`, the Tkinter window with the settings panel, stuck recovery, `--rejoin`, non-full
-   reasons stop the loop, notifications, `build.py` and the Windows CI artifact, release `v0.1.0`.
+4. **M3, app** (code complete 2026-09-26, Windows check pending): `config.py`, the Tkinter window
+   (`app.py`, `gui` command, `ss14-autojoin-gui` script), `build.py` (two one-file builds), the Windows CI
+   artifact. Stuck recovery, `--rejoin`, non-retryable stop were already in M2. Still open: notifications
+   (sound/toast on join), release `v0.1.0`.
 5. **M4, optional**: hub lookup by server name in the settings panel.
 
 ## Open questions (answers go to `decisions.md`)

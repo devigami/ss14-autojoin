@@ -11,9 +11,14 @@ dependencies = [
 
 [project.scripts]
 ss14-autojoin = "ss14_autojoin.cli:main"
+ss14-autojoin-gui = "ss14_autojoin.app:main"
 
 [dependency-groups]
-dev = ["pytest>=8", "ruff>=0.6"]
+dev = [
+    "pyinstaller>=6.16",
+    "pytest>=8",
+    "ruff>=0.6",
+]
 
 [build-system]
 requires = ["hatchling"]

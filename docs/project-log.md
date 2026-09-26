@@ -108,3 +108,11 @@ Dated entries, newest last. Numbers where there are numbers.
 * `join ss14s://lizard.spacestation14.io/server --verbose --max-attempts 3`: poll `78/80 slot free` → connect
   command → client PID 32008 after 2 s → `joined (client kept a UDP socket open for 15 s)` → stop, game left
   running. 17 s from slot to confirmed join. M2 verified on Windows.
+
+## 2026-09-26 (day 2, afternoon): M3 code
+
+* `config.py` (TOML settings, validation, `joiner_config()`), `app.py` (Tkinter window: settings panel with
+  Browse/Detect, Start/Stop, Save, scrolling log; joiner in a thread, queue to the main loop), `gui` command
+  and `ss14-autojoin-gui` script, `build.py` (PyInstaller one-file: `SS14AutoJoin` window build and
+  `ss14-autojoin` console build), CI `windows-app` job uploading both exes on push. Linux console build
+  verified: 17 MB, `--version` and `status` run. 86 tests. Hand-off items 9 and 10 for the Windows check.

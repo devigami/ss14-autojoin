@@ -98,7 +98,7 @@ def test_parser_knows_every_command_and_join_flags() -> None:
 
     parser = build_parser()
     subparsers = next(a for a in parser._actions if isinstance(a, argparse._SubParsersAction))
-    assert set(subparsers.choices) == set(_COMMANDS) == {"status", "watch", "doctor", "join", "probe"}
+    assert set(subparsers.choices) == set(_COMMANDS) == {"status", "watch", "doctor", "join", "probe", "gui"}
     args = parser.parse_args(["join", "ss14://host", "--on-unknown", "retry", "--attempt-timeout", "30"])
     assert args.on_unknown == "retry" and args.attempt_timeout == 30.0
     assert parser.parse_args(["join", "ss14://host"]).on_unknown == "keep"

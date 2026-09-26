@@ -25,5 +25,12 @@ the repository (`docs/fixtures/`) or the session, and tick the item. Nothing els
    from the UDP socket after 15 s, client left running. Exit code 0.
 8. Named pipe test (optional optimisation): `uv run ss14-autojoin doctor --pipe-test` when it exists. Success:
    the launcher window activates (`:Ping`).
-9. Build the Windows binary with `uv run python build.py` if CI's `windows-latest` job is not used, and run
-   the `--onefile` exe once for each CLI mode.
+9. **The window (M3).** `git pull`, `uv sync --all-groups`, then `uv run ss14-autojoin gui`. Expected: the
+   launcher folder is pre-filled from detection, the server defaults to Lizard; press **Start watching** and
+   it behaves like the console `join` with the log in the window; **Stop** ends it; **Save settings** writes
+   `%APPDATA%\ss14-autojoin\config.toml`. Say what looks wrong or is missing (sizes, labels, a field you
+   want).
+10. **The executable.** Either download the `SS14AutoJoin-windows` artifact from the CI run of the latest
+    push (GitHub → Actions → the run → Artifacts) or build locally with `uv run python build.py` (window) and
+    `uv run python build.py --cli` (console) into `dist\`. Run `SS14AutoJoin.exe` once: same window as item 9.
+    Windows Defender may want a moment with an unsigned one-file exe.

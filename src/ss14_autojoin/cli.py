@@ -83,6 +83,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     probe.add_argument("--pid", type=int, default=None, help="client PID (default: the newest SS14.Loader process)")
     probe.add_argument("--seconds", type=float, default=10.0, help="how long to sample (default 10)")
+
+    commands.add_parser("gui", help="open the window with the settings panel and Start/Stop")
     return parser
 
 
@@ -235,7 +237,20 @@ def _print_event(kind: str, message: str) -> None:
     print(f"[{time.strftime('%H:%M:%S')}] {kind:8s} {message}", flush=True)
 
 
-_COMMANDS = {"status": cmd_status, "watch": cmd_watch, "doctor": cmd_doctor, "join": cmd_join, "probe": cmd_probe}
+def cmd_gui(args: argparse.Namespace) -> int:
+    from .app import main as gui_main  # noqa: PLC0415 - tkinter only when asked for
+
+    return gui_main()
+
+
+_COMMANDS = {
+    "status": cmd_status,
+    "watch": cmd_watch,
+    "doctor": cmd_doctor,
+    "join": cmd_join,
+    "probe": cmd_probe,
+    "gui": cmd_gui,
+}
 
 
 def main(argv: Sequence[str] | None = None) -> int:

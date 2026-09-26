@@ -6,8 +6,8 @@ slot), it closes the failed game client and goes back to watching until you are 
 
 **Status (2026-09-26):** the full loop exists (`join`): watch the server, connect through the launcher when a
 slot is free, verify from the client log, close a rejected client and try again. Verified end to end on Jacob's
-Windows machine on 2026-09-26 (joined Lizard on the first free slot). A settings window and a Windows
-executable are next. See `docs/plan.md` for the design and
+Windows machine on 2026-09-26 (joined Lizard on the first free slot). A window with a settings panel
+(`ss14-autojoin gui`) and one-file Windows executables (built by CI) exist and await their first Windows check. See `docs/plan.md` for the design and
 `docs/handoff.md` for what still needs a Windows machine.
 
 ## Run
@@ -21,6 +21,8 @@ uv run ss14-autojoin status ss14://server.example.org --json
 uv run ss14-autojoin watch  ss14://server.example.org --interval 3   # print whenever the slot situation changes
 uv run ss14-autojoin doctor                                          # find the launcher install and its data folders
 uv run ss14-autojoin join ss14s://lizard.spacestation14.io/server --verbose   # the auto-join loop
+uv run ss14-autojoin gui                                             # the window (settings, Start/Stop, log)
+uv run python build.py            # dist/SS14AutoJoin.exe (window); add --cli for dist/ss14-autojoin.exe
 uv run pytest
 ```
 
@@ -28,7 +30,8 @@ uv run pytest
 
 * `src/ss14_autojoin/` the code: `server.py` (addresses, `/status`), `launcher.py` (finding the install),
   `client.py` (reading the client and launcher logs), `joiner.py` (the loop, with injected ports),
-  `runtime.py` (real processes and files), `cli.py`. Coming: `config.py`, `app.py` (settings window).
+  `runtime.py` (real processes and files), `config.py` (settings file), `app.py` (the window), `cli.py`.
+* `build.py` PyInstaller one-file builds; CI uploads the Windows executables on every push.
 * `tests/` pytest, with a local fake status server.
 * `docs/` `plan.md`, `ss14-launcher-reference.md` (verified facts about the launcher, engine and content),
   `decisions.md`, `handoff.md`, `project-log.md`.
