@@ -156,3 +156,8 @@ Dated entries, newest last. Numbers where there are numbers.
   (from the exe resource). The title bar still did not, in a build predating the diagnostic line. Python
   3.14's bundled Tk is 9.0.4, so Tk's own icon path is suspect. Added a Windows API fallback: after the window
   is mapped, `WM_SETICON` big and small on the frame window via ctypes, logged in the window.
+
+## 2026-09-26 11:28: icon everywhere
+
+* With the WM_SETICON fallback the title bar shows the icon too. Root cause on record: Tk 9.0.4 on Windows
+  accepts `wm iconbitmap` without applying it to the title bar. Hand-off item 12 closed; nothing is open.

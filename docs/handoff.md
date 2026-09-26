@@ -30,11 +30,5 @@ the repository (`docs/fixtures/`) or the session, and tick the item. Nothing els
 10. ~~The executable~~ **Done 2026-09-26**: the window builds and runs.
 11. ~~Sound~~ **Done 2026-09-26**: fanfare plays from the exe, the setting is respected; the extra window bell
     is removed.
-12. **Icon, second try.** First try (2026-09-26 11:14): Properties showed the icon, Explorer's list, the
-    window and the taskbar did not. Fixes: the ICO's small entries are now classic bitmaps (Tk cannot read
-    PNG-compressed ICO entries), the window sets the ICO first, and an icon problem is written to the window's
-    log instead of being swallowed. Check after `git pull`: (a) `uv run ss14-autojoin gui` shows the icon in
-    the title bar and taskbar, and no `icon could not be set` line appears in the log; (b) rebuild with
-    `uv run python build.py` and **look at the exe under a new name or in a new folder** (copy it to the
-    Desktop as `SS14AutoJoin-test.exe`): Explorer caches icons by path, so the old path may keep showing the
-    stale generic icon until the cache is rebuilt (`ie4uinit.exe -show` in a terminal forces that).
+12. ~~Icon~~ **Done 2026-09-26 11:28**: shown in Explorer (after leaving the cached path), the taskbar and the
+    title bar. Log: `icon set (ico) ... with Tk 9.0.4`, then `icon applied through the Windows API`.
