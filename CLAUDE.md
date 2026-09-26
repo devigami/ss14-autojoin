@@ -16,6 +16,8 @@ happened, newest last), `docs/development/verification.md` (what was checked on 
   builds Windows and Linux binaries and publishes `v<version>` with generated notes. `docs.yml` publishes the
   MkDocs site to GitHub Pages on changes under `docs/`.
 * **Untested**: Linux and macOS joining, the standalone (non-Steam) launcher. Issue templates ask for the logs.
+* **Signing**: not yet; SignPath Foundation application in progress. Windows builds carry a version resource;
+  a winget package is prepared (`packaging/winget/`), first submission by hand, later ones by `release.yml`.
 
 ## Stack and commands
 
@@ -49,7 +51,8 @@ src/ss14_autojoin/        server.py (addresses, /status), launcher.py (install d
                           config.py (TOML settings), app.py (Tkinter window), notify.py (sounds), cli.py,
                           gui_main.py and cli_main.py (PyInstaller entry scripts, imported by nothing),
                           data/ (fanfare.wav, icon.png, icon.ico; generated, public domain)
-tools/                    make_fanfare.py, make_icon.py
+tools/                    make_fanfare.py, make_icon.py, make_winget_manifest.py
+packaging/winget/         winget manifests (portable package Devigami.SS14AutoJoin) and how to submit them
 tests/                    pytest; fake HTTP server; fixtures under docs/development/fixtures/
 .github/workflows/        ci.yml (tests, docs build, Windows artifact), docs.yml (Pages), release.yml
 .github/ISSUE_TEMPLATE/   join problem, launcher not found, other platform, feature request

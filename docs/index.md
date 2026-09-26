@@ -36,3 +36,4 @@ and goes back to watching. When the join succeeds it plays a short fanfare and l
 * [How it works](how-it-works.md): the loop, and how success and failure are detected.
 * [Settings](settings.md) and the [command line](command-line.md).
 * [Troubleshooting](troubleshooting.md) and the [FAQ](faq.md).
+* [Privacy](privacy.md): nothing is collected; here is what the program touches.

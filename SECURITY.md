@@ -43,7 +43,7 @@ Knowing this makes it easier to judge what is in scope.
 * **Credentials.** None. The tool never reads, stores or transmits your Space Station 14 account, token or
   password; those stay inside the official launcher.
 
-Reports about any behaviour outside this list are in scope and welcome, as are reports about the safety of
+The [privacy policy](PRIVACY.md) restates this list for users. Reports about any behaviour outside it are in scope and welcome, as are reports about the safety of
 process termination, path handling in installation discovery, and parsing of the launcher and client logs
 (which are inputs the tool reads but does not control).
 
