@@ -5,7 +5,8 @@
 `tools/make_winget_manifest.py <version> <sha256 of SS14AutoJoin-<version>-windows-x64.exe> [release date]`.
 
 The package is `Devigami.SS14AutoJoin`, a *portable* installer: winget copies the window executable into its
-portable folder and adds the alias `SS14AutoJoin` to the path. Installing this way avoids the SmartScreen
+portable folder and adds the alias `SS14AutoJoin` (the first `Commands` entry; `PortableCommandAlias` applies
+only to files inside archives) to the path. Installing this way avoids the SmartScreen
 prompt, because the file never carries the browser's mark of the web.
 
 ## First submission (once, by hand)
