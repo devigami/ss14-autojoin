@@ -260,8 +260,9 @@ failure lines can stay in memory indefinitely: Jacob's copy of the log, taken wh
 failure, ends at `Switching to state Content.Client.Launcher.LauncherConnecting`. On client exit the pipe
 reaches EOF and the read loop returns without disposing the stream, yet **the buffer does reach disk on exit**
 (verified: the same attempt copied after pressing Exit was complete). So a post-mortem read after closing the
-client sees the denial reason. During a successful join the game keeps logging, so the join lines appear within the
-next 4 KiB of output (seconds to a minute).
+client sees the denial reason. **A successful join does not flush it either** (first `join` run, 2026-09-26): a client sitting in the lobby
+with the rules popup open is as quiet as a rejected one, and its join lines stayed in the buffer for the
+whole 45 s the tool waited. While the client is alive the log tells success from failure only by luck.
 
 **No way to make the client log elsewhere or more verbosely from outside.** `SS14_LOG_CLIENT` (set by the
 launcher on macOS only) is read by nothing in the engine checkout; the `log.enabled`, `log.path`,
@@ -353,6 +354,16 @@ Useful launcher log lines: `Connect command: "<uri>", "<reason>"`, `Dropping con
 | redial-flag retry delay | 15 s | `LauncherConnectingGui.RedialWaitTimeSeconds` |
 | soft cap default | 30 | `game.soft_max_players` |
 
+## 12a. Telling a joined client from a rejected one without the log
+
+Engine `NetManager.ClientConnect.cs`: each connection attempt starts a Lidgren `NetPeer` with its own bound UDP
+socket (one per candidate address). On failure every peer is shut down (`peer.Shutdown`, `_toCleanNetPeers`)
+and the sockets close; on success the winning peer stays for the whole session. So the client's open UDP
+socket count is 0 after a rejection and at least 1 while connected. The tool reads it with psutil
+(`Process.net_connections(kind="udp")`); **whether Windows lets a non-elevated process read another
+process's UDP table this way is unverified** (`ss14-autojoin probe` checks it, hand-off item 7). The server's
+`/status` player count is corroboration only.
+
 ## 13. Not verified, and to check on Windows
 
 * Whether `players` in `/status` counts players still in the handshake (it uses `PlayerCount`, which counts
@@ -360,5 +371,6 @@ Useful launcher log lines: `Connect command: "<uri>", "<reason>"`, `Dropping con
 * Any engine-side rate limit on repeated connection attempts from one address.
 * How long after client exit the flushed log is complete (Jacob copied it some seconds later; the tool should
   poll the file for the `Goodbye` line or give it a few seconds).
+* The UDP socket count of a connected versus a rejected client as seen by psutil on Windows (section 12a).
 * Whether `PipeOptions.CurrentUserOnly` accepts a Python client on the same user account (it should; the
   fallback of invoking `bin_x64\SS14.Launcher.exe <uri>` avoids the question).

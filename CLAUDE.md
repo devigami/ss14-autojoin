@@ -12,9 +12,11 @@ general SS14 notes and the conventions this project follows; clone it when you n
 ## Status (update this section every session)
 
 * **Milestone**: M0 and M1 done 2026-09-25 (scaffold, `server.py`, `status`/`watch`); M2 code complete
-  2026-09-26 (`launcher.py`, `client.py`, `joiner.py`, `runtime.py`, `join`), **not yet run on Windows**.
-  Next: Jacob's first `join` run (hand-off item 7), fix what it shows, then M3 (`config.py`, Tkinter settings
-  window, `build.py`, Windows CI artifact).
+  2026-09-26 (`launcher.py`, `client.py`, `joiner.py`, `runtime.py`, `join`). First Windows run: discovery,
+  slot detection, connect, PID and termination worked; the join was missed because the client log never
+  flushes while the client is quiet, and a live client was killed. Fixed with the UDP-socket witness and
+  keep-on-unknown; awaiting the second run (hand-off item 7). Then M3 (`config.py`, Tkinter settings window,
+  `build.py`, Windows CI artifact).
 * **Have from Jacob (2026-09-25)**: a successful and a failed `client.stdout.log` (`docs/fixtures/`). The
   failed one revealed that the launcher does not flush the log while the client is quiet, so failure
   detection is timeout-based (`docs/plan.md`, "Why this detection method").
@@ -25,9 +27,10 @@ general SS14 notes and the conventions this project follows; clone it when you n
   parsing, process tracking) and `joiner.py`, then the Tkinter settings window (M3, required).
 * **Verified 2026-09-26 (evening)**: cold start with a URI works too (launcher starts, logs in, connects in
   about 6 s). Install has `bin_x64` and `dotnet_x64`.
-* **Waiting on Jacob**: `doctor` output and the first end-to-end `join` run (`docs/handoff.md`, items 6 and 7).
-* **Works today** (Linux-tested): `status`, `watch`, `doctor`, and `join <address>` (the full loop, real
-  adapters untested on Windows).
+* **Waiting on Jacob**: `probe` output (does psutil see the client's UDP socket on Windows?) and the second
+  `join` run (`docs/handoff.md`, item 7).
+* **Works today**: `status`, `watch`, `doctor` (Windows-verified), `join <address>` (Windows-run once, see
+  above), `probe` (socket signal check).
 
 ## Stack and commands
 
@@ -77,6 +80,8 @@ docs/                     plan.md, ss14-launcher-reference.md, decisions.md, han
   connect, and stops retrying on reasons that are not "full" (ban, whitelist, panic bunker).
 * **Be a polite client**: poll no faster than 1 s, default 3 s; one connect attempt per free slot; back off
   when the server is offline.
+* **Never close a game client without evidence that it failed.** Silence is not failure (the log does not
+  flush while the client is quiet); when unsure, keep the client and stop.
 * Logic in importable modules with a headless CLI; any GUI stays thin. Never import the entry script from
   another module (PyInstaller).
 * Dated entries in `docs/project-log.md`; choices made for Jacob in `docs/decisions.md`; both before pushing.

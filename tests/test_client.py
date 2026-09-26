@@ -41,6 +41,7 @@ def test_truncated_fixture_is_pending() -> None:
     state = parse_client_log((FIXTURES / "client.stdout.full.log").read_text())
     assert state.outcome == "pending"
     assert state.summary == "starting"
+    assert not state.connecting_or_later
 
 
 def test_losing_candidate_disconnect_is_not_a_failure() -> None:

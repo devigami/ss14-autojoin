@@ -96,10 +96,11 @@ Rules:
 * **CONNECTING**: exactly one connect command per attempt. Before sending, make sure no `SS14.Loader` from a
   previous attempt is alive. Success of the *command* is a new `Connect command:` line in the launcher log
   or a client PID; failure is `Dropping connect command` or no client within 20 s.
-* **VERIFYING**: tail the new `client.stdout.log`. Joined = `Handshake completed, connection established.` or
-  `Runlevel changed to: Connected`. Failed = a `Disconnected` for the winning endpoint before the handshake, an
-  `Exception during handshake`, or (the usual case, because the file lags) no success marker within the attempt
-  timeout (first estimate 45 s from the client PID; 90 s while the launcher log shows `Updating`).
+* **VERIFYING**: tail the new `client.stdout.log` and count the client's UDP sockets every tick. Joined =
+  `Handshake completed` / `Runlevel changed to: Connected` in the log, or a socket open for 15 s. Failed = a
+  `Disconnected` for the winning endpoint or an `Exception during handshake` in the log, the client exiting,
+  or 0 sockets after 12 s once connecting began. Nothing by 60 s = unknown: keep the client, stop the tool
+  (`--on-unknown retry` to close it and try again instead).
 * **FAILED**: terminate the client (`psutil` terminate, then kill after 5 s), confirm it is gone, wait
   `cooldown` (default 2 s), return to WATCHING. Log the reason. If the reason is not "full" (ban, whitelist,
   panic bunker, version mismatch), stop and tell the user: retrying will not help.
@@ -116,18 +117,18 @@ Rules:
 
 | Signal | Reliability | Latency | Used for |
 |---|---|---|---|
-| `client.stdout.log` lines (reference §10) | high wording-wise, **but the file lags up to 4 KiB of output behind the client**: a failed client goes quiet and its failure lines may never reach disk while it lives | seconds during a join; unbounded after a failure | success detection (the join keeps logging); post-mortem classification of a failure after the client is closed |
-| absence of the success marker within the attempt timeout, client still alive | good once the timeout is calibrated from real joins (Jacob's join reached `InGame` within one client start-up) | the timeout | **primary failure detection** |
+| `client.stdout.log` lines (reference §10) | high wording-wise, **but the file lags up to 4 KiB of output behind the client**, and both a rejected client and one waiting in the lobby are quiet, so while the client lives the log usually shows neither outcome | seconds when it flushes; unbounded otherwise | early decision when it does flush; post-mortem classification after the client is closed |
+| the client's open UDP sockets (reference §12a) | rejected: 0 (Lidgren peers shut down); connected: 1 for the whole session. Windows readability via psutil to be confirmed | seconds | **primary live decision**: 0 sockets after 12 s = failed; a socket open for 15 s = joined |
+| absence of any evidence within the attempt timeout, client still alive | says nothing by itself | the timeout | **default: keep the client and stop** (never kill a possibly live session); `--on-unknown retry` closes it and tries again |
 | launcher log (`Connect command`, `PID`, `Dropping`, `Failed to connect: ConnectionFailed`/`UpdateError`) | high | seconds (Serilog file sink) | command accepted, client PID, stuck detection, launcher-side failures |
 | `SS14.Loader` process alive | high for "client exists", says nothing about the join | immediate | cleanup and sanity checks |
 | `/status` players count rising after the attempt | weak (others join too; admins excluded; polling lag) | 3 to 5 s | corroboration only, never a decision |
 
-Revised on 2026-09-25 after Jacob's logs (`docs/fixtures/`): VERIFYING treats "no `Handshake completed` /
-`Runlevel changed to: Connected` within the attempt timeout" as the failure, terminates the client, then reads
-the log once more (it may flush on exit) to classify the reason. When no reason can be read, the attempt counts
-as "full" and the loop continues, with a cap on consecutive unclassified failures so a real ban or whitelist
-denial cannot loop forever. The attempt timeout starts when the client PID appears and should be set from
-measured start-up-to-`InGame` times (first estimate 45 s, 90 s while the launcher log shows `Updating`).
+Revised on 2026-09-26 after the first real run killed a client that had in fact joined (the log never
+flushed; the tool treated silence as failure). VERIFYING now decides from three witnesses: the log when it
+flushes, the client's UDP sockets, and the client's exit. Silence until the attempt timeout keeps the client
+and stops the tool by default. After a decided failure the client is terminated and the log read post-mortem
+(it flushes on exit) to classify the reason; unreadable reasons count towards a cap so a ban cannot loop.
 
 ## Cloud versus Windows
 

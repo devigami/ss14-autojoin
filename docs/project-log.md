@@ -84,3 +84,14 @@ Dated entries, newest last. Numbers where there are numbers.
   without restart, offline back-off and max attempts, panic bunker filter and stop, rejoin after kick).
 * `runtime.py`: real ports (subprocess for the launcher command with `DOTNET_ROOT`, psutil for the client
   process, the two log tails). `join` CLI command wired. 76 tests pass. Hand-off item 7 is the first real run.
+
+## 2026-09-26 (day 2): first real run, one wrong kill, the socket witness
+
+* First `join` run on Windows: discovery, slot detection (three attempts, each on a `79/80` poll), the connect
+  command, PID pick-up and termination all worked. But the client log never flushed after a successful join
+  either (lobby with the rules popup is quiet), the tool saw no success marker in 45 s, and killed a live
+  session. Jacob also read the behaviour as brute force; it was slot-driven, the server hovered at the cap.
+* Fix: (1) unknown outcome now keeps the client and stops the tool (`--on-unknown retry` restores the old
+  behaviour); (2) new witness: the client's open UDP socket count via psutil (0 after a rejection since Lidgren
+  peers are shut down, 1 while connected). Joined after 15 s of an open socket, failed after 12 s with none.
+  `probe` command to check the signal on Windows. 79 tests.

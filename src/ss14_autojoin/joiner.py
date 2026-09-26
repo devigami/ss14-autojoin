@@ -41,8 +41,15 @@ class JoinerConfig:
     """Seconds from the connect command until the launcher must have started a client."""
     update_timeout: float = 180.0
     """The connect timeout while the launcher is downloading content."""
-    attempt_timeout: float = 45.0
-    """Seconds from the client PID until a success marker must have been logged."""
+    attempt_timeout: float = 60.0
+    """Seconds from the client PID until the attempt is decided one way or the other."""
+    socket_grace: float = 12.0
+    """Seconds after the client PID before "no UDP socket" counts as a rejected connection."""
+    confirm_after: float = 15.0
+    """Seconds of an open UDP socket after the client PID that count as a join (the log may never flush)."""
+    unknown_policy: str = "keep"
+    """What to do when the attempt timeout passes without evidence either way: ``keep`` the client running
+    and stop the tool (never kill a session that may be live), or ``retry`` (close it and try again)."""
     exit_grace: float = 10.0
     """Seconds to wait for a terminated client to be gone (and its log to flush)."""
     cooldown: float = 2.0
@@ -72,6 +79,9 @@ class Ports(Protocol):
     def process_alive(self, pid: int) -> bool: ...
     def terminate(self, pid: int) -> None: ...
     def restart_launcher(self, uri: str) -> None: ...
+    def client_udp_sockets(self, pid: int) -> int | None:
+        """Open UDP sockets of the client, or None when that cannot be read."""
+        ...
 
 
 @dataclass(slots=True)
@@ -84,6 +94,9 @@ class Attempt:
     reason: str = ""
     deny: DenyReason | None = None
     log: ClientLogState = field(default_factory=ClientLogState)
+    sockets_seen: int = 0
+    """How many consecutive checks found at least one UDP socket open."""
+    last_sockets: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -202,33 +215,62 @@ class Joiner:
     def _verifying(self) -> None:
         attempt = self._current()
         assert attempt.pid is not None and attempt.pid_at is not None
+        elapsed = self.ports.now() - attempt.pid_at
         attempt.log.feed_lines(self.ports.client_lines())
         exited = any(e.kind == "client_exited" and e.pid == attempt.pid for e in self.ports.launcher_events())
         if attempt.log.outcome == "joined":
-            attempt.outcome = "joined"
-            self.unknown_failures = 0
-            self.listener("joined", f"joined {self.config.address.uri} on attempt {attempt.number}")
-            self.phase = Phase.JOINED
+            self._join(attempt, "the client log shows the handshake completed")
             return
         if attempt.log.outcome == "failed":
             self._fail_attempt(attempt.log.summary, attempt.log.deny)
             return
         if exited or not self.ports.process_alive(attempt.pid):
-            attempt.log.feed_lines(self.ports.client_lines())  # the buffer flushes on exit
+            attempt.log.feed_lines(self.ports.client_lines())  # the launcher flushes the log on exit
             if attempt.log.outcome == "joined":
-                self.phase = Phase.VERIFYING  # re-evaluate on the next step with the full log
-                attempt.outcome = "joined"
-                self.listener("joined", f"joined {self.config.address.uri}, but the client already exited")
-                self.phase = Phase.JOINED
+                self._join(attempt, "the client log shows the handshake completed, but the client has exited")
                 return
-            self._fail_attempt(
-                attempt.log.summary if attempt.log.outcome == "failed" else "client exited", attempt.log.deny
-            )
+            reason = attempt.log.summary if attempt.log.outcome == "failed" else "client exited"
+            self._fail_attempt(reason, attempt.log.deny)
             return
-        if self.ports.now() - attempt.pid_at > self.config.attempt_timeout:
-            self._fail_attempt("no join within the attempt timeout", None)
+        # The log rarely flushes while the client is quiet, so the network is the second witness: a rejected
+        # client closes its UDP sockets, a connected one keeps one open for the whole session.
+        sockets = self._udp_sockets(attempt.pid)
+        attempt.last_sockets = sockets
+        if sockets is not None:
+            attempt.sockets_seen = attempt.sockets_seen + 1 if sockets > 0 else 0
+            if sockets == 0 and elapsed > self.config.socket_grace and attempt.log.connecting_or_later:
+                self._fail_attempt("client closed its network sockets (connection rejected or lost)", None)
+                return
+            if sockets > 0 and elapsed > self.config.confirm_after and attempt.sockets_seen >= 3:
+                self._join(attempt, f"client kept a UDP socket open for {elapsed:.0f} s")
+                return
+        if elapsed > self.config.attempt_timeout:
+            if self.config.unknown_policy == "retry":
+                self._fail_attempt("no join within the attempt timeout", None)
+            else:
+                attempt.outcome = "unknown"
+                self._finish(
+                    False,
+                    f"stopped after {elapsed:.0f} s without evidence either way; the client (pid {attempt.pid}) "
+                    "was left running so a live session is not lost. Check the game window.",
+                )
             return
         self.ports.sleep(self.config.tick)
+
+    def _join(self, attempt: Attempt, evidence: str) -> None:
+        attempt.outcome = "joined"
+        self.unknown_failures = 0
+        self.listener("joined", f"joined {self.config.address.uri} on attempt {attempt.number} ({evidence})")
+        self.phase = Phase.JOINED
+
+    def _udp_sockets(self, pid: int) -> int | None:
+        reader = getattr(self.ports, "client_udp_sockets", None)
+        if reader is None:
+            return None
+        try:
+            return reader(pid)
+        except Exception:  # noqa: BLE001 - a broken probe must not stop the loop
+            return None
 
     def _failed(self) -> None:
         attempt = self._current()

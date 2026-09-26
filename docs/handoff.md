@@ -21,21 +21,29 @@ the repository (`docs/fixtures/`) or the session, and tick the item. Nothing els
 ## Later (M2, M3)
 
 6. Run `uv run ss14-autojoin doctor` on Windows and paste the output (it exists now: detected install, runtime folder, log paths).
-7. **First end-to-end run (ready to try).** In the repository folder on Windows:
+7. **End-to-end run, second try.** The first run (2026-09-26 10:03) found slots and launched correctly but
+   killed a client that had joined, because the client log never flushed. Two checks now:
+
+   (a) **Does psutil see the client's UDP socket?** With the game running and connected (any server), then
+   again while it shows "Failed to connect":
 
    ```powershell
-   uv sync --all-groups
-   uv run ss14-autojoin doctor
-   uv run ss14-autojoin join ss14s://lizard.spacestation14.io/server --verbose
+   uv run ss14-autojoin probe --seconds 5
    ```
 
-   The tool polls Lizard every 3 s, prints a line when the player count or slot state changes, and when a slot
-   is free runs `bin_x64\SS14.Launcher.exe <uri>`. It then waits for the client PID in the launcher log, reads
-   `client.stdout.log` for the join, and on a "server is full" denial (or 45 s without a join) closes the
-   client with `terminate`, reads the reason once the log flushes, waits 2 s and watches again. Success is a
-   `joined` line and exit code 0. Paste the whole console output, joined or not; the interesting cases are a
-   wrong PID, a client left open, or an attempt that never sees the join although you are in the game.
-   Useful flags: `--max-attempts 3` for a bounded test, `--rejoin`, `--restart-launcher`.
+   Expected: `udp_sockets=1` (or more) while connected, `udp_sockets=0` on the failure screen. If it prints
+   `udp_sockets=None` in both cases, Windows is not letting the tool read the socket table and the fallback
+   is the keep-on-unknown behaviour only; say so.
+
+   (b) **The loop again**, when Lizard is near full:
+
+   ```powershell
+   uv run ss14-autojoin join ss14s://lizard.spacestation14.io/server --verbose --max-attempts 3
+   ```
+
+   Now a join is reported after about 15 s from the socket, a rejection after about 12 s, and if neither can be
+   seen the tool stops and leaves the client running with a message naming its PID (it never closes a client
+   without evidence). Paste the console output.
 8. Named pipe test (optional optimisation): `uv run ss14-autojoin doctor --pipe-test` when it exists. Success:
    the launcher window activates (`:Ping`).
 9. Build the Windows binary with `uv run python build.py` if CI's `windows-latest` job is not used, and run

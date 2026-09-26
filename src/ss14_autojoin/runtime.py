@@ -102,6 +102,9 @@ class RealPorts:
         except psutil.Error:
             pass
 
+    def client_udp_sockets(self, pid: int) -> int | None:
+        return udp_socket_count(pid)
+
     def restart_launcher(self, uri: str) -> None:
         import psutil  # noqa: PLC0415
 
@@ -117,3 +120,17 @@ class RealPorts:
                     pass
         time.sleep(1.0)
         self.send_connect(uri)
+
+
+def udp_socket_count(pid: int) -> int | None:
+    """Number of UDP sockets the process holds (psutil), or None when it cannot be read."""
+    import psutil  # noqa: PLC0415
+
+    try:
+        proc = psutil.Process(pid)
+        connections = (
+            proc.net_connections(kind="udp") if hasattr(proc, "net_connections") else proc.connections(kind="udp")
+        )
+    except psutil.Error:
+        return None
+    return len(connections)

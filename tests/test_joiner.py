@@ -83,6 +83,14 @@ class FakePorts:
         self.restarts.append(uri)
         self.script = {"pid": 999, "pid_after": 3, "lines": JOINED_LINES, "connect_at": self.time}
 
+    def client_udp_sockets(self, pid: int) -> int | None:
+        s = self.script or {}
+        if "udp" not in s:
+            return None
+        if "udp_after" in s and self.time - s["connect_at"] < s["udp_after"]:
+            return 1  # still connecting
+        return s["udp"]
+
     # scripted world advancing with time
     def _advance(self) -> None:
         s = self.script
@@ -107,6 +115,7 @@ class FakePorts:
 
 
 def make(ports, **overrides) -> Joiner:
+    overrides.setdefault("unknown_policy", "retry")  # most scenarios exercise the retry path
     config = JoinerConfig(address=ADDRESS, cooldown=1, **overrides)
     log: list[tuple[str, str]] = []
     joiner = Joiner(config, ports, listener=lambda kind, msg: log.append((kind, msg)))
@@ -223,3 +232,43 @@ def test_rejoin_watches_the_client_and_starts_over() -> None:
     assert joiner.attempts[0].outcome == "disconnected"
     assert joiner.attempts[1].outcome == "joined"
     assert "gave up after 2 attempts" in outcome.message
+
+
+def test_quiet_log_but_open_socket_counts_as_joined() -> None:
+    # The launcher never flushed the client log (Jacob's run of 2026-09-26), but the client kept its UDP socket.
+    ports = FakePorts([status(79)], [{"pid": 33064, "pid_after": 2, "lines": TRUNCATED_LINES, "udp": 1}])
+    joiner = make(ports, confirm_after=15)
+    outcome = joiner.run()
+    assert outcome.success and ports.terminated == []
+    joined = [m for k, m in joiner.events_log if k == "joined"]
+    assert joined and "UDP socket" in joined[0]
+
+
+def test_closed_sockets_after_grace_is_a_failure() -> None:
+    ports = FakePorts(
+        [status(79)],
+        [
+            {
+                "pid": 1,
+                "pid_after": 2,
+                "lines": TRUNCATED_LINES + ["[DEBG] net: Attempting to connect to h port 1212"],
+                "udp": 0,
+                "udp_after": 4,
+            },
+            {"pid": 2, "pid_after": 2, "lines": JOINED_LINES},
+        ],
+    )
+    joiner = make(ports, socket_grace=12)
+    outcome = joiner.run()
+    assert outcome.success and ports.terminated == [1]
+    assert "network sockets" in joiner.attempts[0].reason
+
+
+def test_unknown_outcome_keeps_the_client_by_default() -> None:
+    ports = FakePorts([status(79)], [{"pid": 7, "pid_after": 2, "lines": TRUNCATED_LINES}])
+    joiner = make(ports, attempt_timeout=10, unknown_policy="keep")
+    outcome = joiner.run()
+    assert not outcome.success
+    assert "left running" in outcome.message and "pid 7" in outcome.message
+    assert ports.terminated == [] and 7 in ports.alive
+    assert joiner.attempts[0].outcome == "unknown"

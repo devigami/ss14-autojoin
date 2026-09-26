@@ -160,6 +160,11 @@ class ClientLogState:
             self.deny = reason
 
     @property
+    def connecting_or_later(self) -> bool:
+        """True once the client has at least started connecting (so a missing socket means something)."""
+        return self.connecting or self.outcome != "pending" or bool(self.initiated)
+
+    @property
     def summary(self) -> str:
         if self.outcome == "joined":
             return "joined" + (

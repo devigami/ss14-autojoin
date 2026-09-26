@@ -169,6 +169,7 @@ def cmd_join(args: argparse.Namespace) -> int:
         interval=args.interval,
         margin=args.margin,
         attempt_timeout=args.attempt_timeout,
+        unknown_policy=args.on_unknown,
         cooldown=args.cooldown,
         max_attempts=args.max_attempts,
         rejoin=args.rejoin,
@@ -185,11 +186,40 @@ def cmd_join(args: argparse.Namespace) -> int:
     return EXIT_OK if outcome.success else EXIT_UNREACHABLE
 
 
+def cmd_probe(args: argparse.Namespace) -> int:
+    import psutil  # noqa: PLC0415
+
+    from .launcher import LOADER_EXE  # noqa: PLC0415
+    from .runtime import udp_socket_count  # noqa: PLC0415
+
+    pid = args.pid
+    if pid is None:
+        clients = [
+            p
+            for p in psutil.process_iter(["name", "create_time"])
+            if (p.info.get("name") or "").lower() == LOADER_EXE.lower()
+        ]
+        if not clients:
+            print("no running game client (SS14.Loader) found; pass --pid", file=sys.stderr)
+            return EXIT_UNREACHABLE
+        pid = max(clients, key=lambda p: p.info.get("create_time") or 0).pid
+    print(f"client pid {pid}: sampling UDP sockets for {args.seconds:g} s (a connected client keeps one open)")
+    deadline = time.monotonic() + args.seconds
+    while True:
+        count = udp_socket_count(pid)
+        alive = psutil.pid_exists(pid)
+        print(f"[{time.strftime('%H:%M:%S')}] alive={alive} udp_sockets={count}", flush=True)
+        if time.monotonic() >= deadline or not alive:
+            break
+        time.sleep(1.0)
+    return EXIT_OK
+
+
 def _print_event(kind: str, message: str) -> None:
     print(f"[{time.strftime('%H:%M:%S')}] {kind:8s} {message}", flush=True)
 
 
-_COMMANDS = {"status": cmd_status, "watch": cmd_watch, "doctor": cmd_doctor, "join": cmd_join}
+_COMMANDS = {"status": cmd_status, "watch": cmd_watch, "doctor": cmd_doctor, "join": cmd_join, "probe": cmd_probe}
 
 
 def main(argv: Sequence[str] | None = None) -> int:
