@@ -4,6 +4,10 @@ on:
     branches: ["**"]
   pull_request:
 
+# Least privilege: the jobs only check out code and upload artifacts, so the token needs read access alone.
+permissions:
+  contents: read
+
 jobs:
   test:
     strategy:

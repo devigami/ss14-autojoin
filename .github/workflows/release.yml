@@ -7,8 +7,9 @@ on:
     branches: [master]
   workflow_dispatch:
 
+# Least privilege: everything reads, only the final job writes the tag and the release.
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   version:
@@ -76,6 +77,8 @@ jobs:
     needs: [version, build]
     if: needs.version.outputs.exists == 'false'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
