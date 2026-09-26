@@ -18,7 +18,7 @@ jobs:
       tag: v${{ steps.read.outputs.version }}
       exists: ${{ steps.check.outputs.exists }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - id: read
@@ -47,8 +47,8 @@ jobs:
             label: linux
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
       - run: uv python install 3.14
       - run: uv sync --all-groups
       - run: uv run pytest
@@ -67,7 +67,7 @@ jobs:
             cp dist/ss14-autojoin "out/ss14-autojoin-$v-linux-x64"
           fi
           ls -la out
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: binaries-${{ matrix.label }}
           path: out/*
@@ -77,14 +77,14 @@ jobs:
     if: needs.version.outputs.exists == 'false'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
         with:
           path: out
           merge-multiple: true
       - name: Checksums
         run: cd out && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.version.outputs.tag }}
           name: SS14 Auto-Join ${{ needs.version.outputs.tag }}
