@@ -40,3 +40,6 @@ maintainer bumps the version in `pyproject.toml` and `src/ss14_autojoin/__init__
 2. Merge to `master`. The `release` workflow sees a version without a tag, builds Windows and Linux
    binaries, and publishes `v<version>` with generated notes and checksums.
 3. The `docs` workflow publishes the documentation site on every change to `docs/`.
+4. The `winget` job of the release workflow submits the new version to `microsoft/winget-pkgs` when the
+   `WINGET_TOKEN` secret is set; the first version of the package is submitted by hand
+   (`packaging/winget/README.md`).

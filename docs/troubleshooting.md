@@ -43,8 +43,9 @@ missing, the build is incomplete. The fanfare uses the Windows sound API; on oth
 
 ## Windows says the executable is unrecognised
 
-The builds are not code-signed. Choose **More info** and **Run anyway**, verify the download came from the
-project's releases page, or build from source with `uv run python build.py`.
+The builds are not code-signed yet (signing through SignPath Foundation is in progress). Choose **More info**
+and **Run anyway**, verify the download's checksum against `SHA256SUMS.txt` on the release, install through
+`winget` when the package is available, or build from source with `uv run python build.py`.
 
 ## The icon looks wrong in Explorer
 

@@ -98,3 +98,22 @@ jobs:
             Single-file builds. Windows is the tested platform; the Linux builds are provided untested.
             `SS14AutoJoin-*` is the window, `ss14-autojoin-*` the console tool. Documentation:
             https://devigami.github.io/ss14-autojoin/
+
+  winget:
+    # Submits the new version to microsoft/winget-pkgs once the package exists there (see packaging/winget/).
+    needs: [version, release]
+    if: needs.version.outputs.exists == 'false'
+    runs-on: windows-latest
+    env:
+      HAS_WINGET_TOKEN: ${{ secrets.WINGET_TOKEN != '' }}
+    steps:
+      - if: env.HAS_WINGET_TOKEN == 'true'
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: Devigami.SS14AutoJoin
+          version: ${{ needs.version.outputs.version }}
+          release-tag: ${{ needs.version.outputs.tag }}
+          installers-regex: 'SS14AutoJoin-.*-windows-x64\.exe$'
+          token: ${{ secrets.WINGET_TOKEN }}
+      - if: env.HAS_WINGET_TOKEN != 'true'
+        run: echo "WINGET_TOKEN not set; skipping the winget submission (see packaging/winget/README.md)."

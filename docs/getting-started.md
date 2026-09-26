@@ -7,6 +7,11 @@ Grab the latest `SS14AutoJoin.exe` from the
 A console version, `ss14-autojoin.exe`, is attached to the same release for people who prefer a terminal
 (see [Command line](command-line.md)).
 
+!!! tip "winget"
+    Once the package is accepted into the Windows Package Manager, `winget install Devigami.SS14AutoJoin`
+    installs the window as a portable command (`SS14AutoJoin`) without the SmartScreen prompt, because the
+    file never passes through the browser. Until then, download from the releases page.
+
 !!! note "SmartScreen"
     The executable is not code-signed, so Windows may show "Windows protected your PC" the first time. Choose
     **More info** and **Run anyway**, or build it yourself from source (below).
