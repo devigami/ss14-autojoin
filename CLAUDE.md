@@ -29,7 +29,7 @@ general SS14 notes and the conventions this project follows; clone it when you n
 * **Verified 2026-09-26 (evening)**: cold start with a URI works too (launcher starts, logs in, connects in
   about 6 s). Install has `bin_x64` and `dotnet_x64`.
 * **Verified 2026-09-26**: psutil sees the client's UDP socket on Windows (1 connected, 0 rejected).
-* **Waiting on Jacob**: opinion on the join sound (hand-off item 11); the merge/release decision.
+* **Waiting on Jacob**: the fanfare from the built exe (hand-off item 11); the merge/release decision.
 * **Works today** (all Windows-verified): `status`, `watch`, `doctor`, `join`, `probe`, `gui`, and the
   PyInstaller builds.
 
@@ -63,7 +63,8 @@ pyproject.toml, uv.lock   project and pins (lock is committed)
 src/ss14_autojoin/        server.py (addresses, /status), launcher.py (install discovery), client.py (log
                           parsing, tails), joiner.py (state machine, injected ports), runtime.py (real ports),
                           config.py (TOML settings), app.py (Tkinter window), cli.py, gui_main.py and
-                          cli_main.py (PyInstaller entry scripts, imported by nothing), notify.py (sounds)
+                          cli_main.py (PyInstaller entry scripts, imported by nothing), notify.py (sounds), data/fanfare.wav
+tools/                    make_fanfare.py (regenerates the join sound)
 tests/                    pytest; fake HTTP server, fixture logs under docs/fixtures/
 docs/                     plan.md, ss14-launcher-reference.md, decisions.md, handoff.md, project-log.md,
                           fixtures/ (real logs from Jacob's machine, redacted)

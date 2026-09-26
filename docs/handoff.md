@@ -28,5 +28,8 @@ the repository (`docs/fixtures/`) or the session, and tick the item. Nothing els
 9. ~~The window~~ **Done 2026-09-26 10:42**: detection pre-filled the Steam folder, Save wrote the config,
    Start joined Lizard through the window (77/80, PID after 2 s, joined at 15 s).
 10. ~~The executable~~ **Done 2026-09-26**: the window builds and runs.
-11. **Sound.** After `git pull`, a join now plays the Windows alert sound three times (console and window).
-    Say if it is too much, too little, or if you would rather have a toast.
+11. **Sound.** After `git pull`, a join plays `fanfare.wav` (a brass "ta-da" synthesized by
+    `tools/make_fanfare.py`, public domain); the window has a "Play a fanfare when joined" box, the console
+    tool a `--quiet` flag. Check: `uv run ss14-autojoin doctor` prints the `join sound:` path; from the built
+    `SS14AutoJoin.exe`, a join should play it too (the WAV is bundled). Say if the sound itself needs tuning
+    (length, pitch, volume).

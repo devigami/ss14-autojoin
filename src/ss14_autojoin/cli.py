@@ -166,6 +166,9 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     print(f"launcher exe:      {install.launcher_exe}")
     print(f"loader exe:        {install.loader_exe or 'missing'}")
     print(f"dotnet root:       {install.dotnet_root or 'missing (a system-wide .NET runtime is then required)'}")
+    from .notify import fanfare_path  # noqa: PLC0415
+
+    print(f"join sound:        {fanfare_path() or 'missing (falls back to the alert sound)'}")
     return EXIT_OK
 
 
@@ -203,9 +206,13 @@ def cmd_join(args: argparse.Namespace) -> int:
         print()
         return EXIT_INTERRUPTED
     if not args.quiet:
-        from .notify import beep  # noqa: PLC0415
+        from .notify import beep, play_success  # noqa: PLC0415
 
-        beep(3 if outcome.success else 1)
+        if outcome.success:
+            play_success()
+            time.sleep(1.5)  # let the asynchronous playback finish before the process exits
+        else:
+            beep(1)
     return EXIT_OK if outcome.success else EXIT_UNREACHABLE
 
 

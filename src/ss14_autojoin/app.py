@@ -17,7 +17,7 @@ from tkinter import filedialog, messagebox, scrolledtext, ttk
 from .config import Settings, config_path, load, save
 from .joiner import Joiner
 from .launcher import find_launcher, launcher_data_dir, running_launcher_exes
-from .notify import beep
+from .notify import play_success
 
 TITLE = "SS14 Auto-Join"
 
@@ -36,6 +36,7 @@ def settings_to_form(settings: Settings) -> dict[str, str | bool]:
         "rejoin": settings.rejoin,
         "restart_launcher": settings.restart_launcher,
         "skip_panic_bunker": settings.skip_panic_bunker,
+        "sound": settings.sound,
     }
 
 
@@ -63,6 +64,7 @@ def form_to_settings(form: dict[str, str | bool]) -> tuple[Settings, list[str]]:
         rejoin=bool(form.get("rejoin", False)),
         restart_launcher=bool(form.get("restart_launcher", False)),
         skip_panic_bunker=bool(form.get("skip_panic_bunker", False)),
+        sound=bool(form.get("sound", True)),
     )
     problems += settings.validate()
     return settings, problems
@@ -130,6 +132,7 @@ class App:
                 ("rejoin", "Rejoin after the client exits or is disconnected"),
                 ("restart_launcher", "Restart a stuck launcher"),
                 ("skip_panic_bunker", "Skip while panic bunker is on"),
+                ("sound", "Play a fanfare when joined"),
             ]
         ):
             var = tk.BooleanVar()
@@ -250,8 +253,8 @@ class App:
                     self.status.configure(text=message[:80])
                     self.root.bell()
                     self.root.lift()
-                if kind == "joined":
-                    threading.Thread(target=beep, args=(3,), daemon=True).start()
+                if kind == "joined" and self.settings.sound:
+                    threading.Thread(target=play_success, daemon=True).start()
         except queue.Empty:
             pass
         self.root.after(200, self._drain)

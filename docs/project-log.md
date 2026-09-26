@@ -123,3 +123,10 @@ Dated entries, newest last. Numbers where there are numbers.
   (77/80 → PID after 2 s → joined at 15 s) with the log in the window. The PyInstaller window build runs.
   M3 verified. Added `notify.py`: three alert sounds on a join (`--quiet` in the console), a bell and window
   raise when the loop stops.
+
+## 2026-09-26: join sound option and fanfare
+
+* Jacob asked for a GUI switch for the join sound and a free trumpet success sound. Added `sound` to the
+  settings and window, `--quiet` stays for the console. `tools/make_fanfare.py` synthesizes
+  `data/fanfare.wav` (1.47 s, 127 KB, public domain); `notify.play_success` plays it (winsound on Windows,
+  afplay/paplay/aplay elsewhere, bell fallback); PyInstaller bundles the data folder. 88 tests.

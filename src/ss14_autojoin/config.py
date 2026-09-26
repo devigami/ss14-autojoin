@@ -33,6 +33,8 @@ class Settings:
     rejoin: bool = False
     restart_launcher: bool = False
     skip_panic_bunker: bool = False
+    sound: bool = True
+    """Play the fanfare when the join lands."""
 
     def joiner_config(self) -> JoinerConfig:
         return JoinerConfig(

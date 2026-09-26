@@ -7,6 +7,7 @@ separate console build when ``--cli`` is given (``dist/ss14-autojoin[.exe]``).
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -29,6 +30,8 @@ def build(entry: Path, name: str, console: bool) -> None:
         "--clean",
         "--noconfirm",
         "--console" if console else "--noconsole",
+        "--add-data",
+        f"{SRC / 'data'}{os.pathsep}ss14_autojoin/data",
     ]
     for module in HIDDEN:
         args += ["--hidden-import", module]
