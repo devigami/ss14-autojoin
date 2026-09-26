@@ -6,8 +6,8 @@ slot), it closes the failed game client and goes back to watching until you are 
 
 **Status (2026-09-26):** the full loop exists (`join`): watch the server, connect through the launcher when a
 slot is free, verify from the client log, close a rejected client and try again. Verified end to end on Jacob's
-Windows machine on 2026-09-26 (joined Lizard on the first free slot). A window with a settings panel
-(`ss14-autojoin gui`) and one-file Windows executables (built by CI) exist and await their first Windows check. See `docs/plan.md` for the design and
+Windows machine on 2026-09-26 (joined Lizard on the first free slot). The window with the settings panel
+(`ss14-autojoin gui`) and the one-file Windows executables (built by CI on every push) are verified too. See `docs/plan.md` for the design and
 `docs/handoff.md` for what still needs a Windows machine.
 
 ## Run

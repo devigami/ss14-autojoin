@@ -116,3 +116,10 @@ Dated entries, newest last. Numbers where there are numbers.
   and `ss14-autojoin-gui` script, `build.py` (PyInstaller one-file: `SS14AutoJoin` window build and
   `ss14-autojoin` console build), CI `windows-app` job uploading both exes on push. Linux console build
   verified: 17 MB, `--version` and `status` run. 86 tests. Hand-off items 9 and 10 for the Windows check.
+
+## 2026-09-26 10:42: window and exe verified
+
+* Jacob ran the window: detection pre-filled the Steam folder, Save wrote the config, Start joined Lizard
+  (77/80 → PID after 2 s → joined at 15 s) with the log in the window. The PyInstaller window build runs.
+  M3 verified. Added `notify.py`: three alert sounds on a join (`--quiet` in the console), a bell and window
+  raise when the loop stops.

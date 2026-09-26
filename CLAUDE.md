@@ -16,8 +16,8 @@ general SS14 notes and the conventions this project follows; clone it when you n
   slot detection, connect, PID and termination worked; the join was missed because the client log never
   flushes while the client is quiet, and a live client was killed. Fixed with the UDP-socket witness and
   keep-on-unknown; **second run joined Lizard end to end (2026-09-26 10:35). M2 verified.** M3 code
-  complete the same day: `config.py`, `app.py` (window), `build.py`, Windows CI artifact; awaiting Jacob's
-  check of the window and the exe (hand-off items 9 and 10). Open: notifications, release `v0.1.0`.
+  complete and **verified the same day** (window joined Lizard, exe runs). Notification sound added.
+  Open: release `v0.1.0` (tag once the branch is merged), and whatever the next real use shows.
 * **Have from Jacob (2026-09-25)**: a successful and a failed `client.stdout.log` (`docs/fixtures/`). The
   failed one revealed that the launcher does not flush the log while the client is quiet, so failure
   detection is timeout-based (`docs/plan.md`, "Why this detection method").
@@ -29,9 +29,9 @@ general SS14 notes and the conventions this project follows; clone it when you n
 * **Verified 2026-09-26 (evening)**: cold start with a URI works too (launcher starts, logs in, connects in
   about 6 s). Install has `bin_x64` and `dotnet_x64`.
 * **Verified 2026-09-26**: psutil sees the client's UDP socket on Windows (1 connected, 0 rejected).
-* **Waiting on Jacob**: the window (`uv run ss14-autojoin gui`) and the CI-built exe (`docs/handoff.md`, 9, 10).
-* **Works today**: `status`, `watch`, `doctor`, `join`, `probe` (all Windows-verified), `gui` (Linux-built,
-  Windows check pending), `uv run python build.py [--cli]` (Linux console build verified).
+* **Waiting on Jacob**: opinion on the join sound (hand-off item 11); the merge/release decision.
+* **Works today** (all Windows-verified): `status`, `watch`, `doctor`, `join`, `probe`, `gui`, and the
+  PyInstaller builds.
 
 ## Stack and commands
 
@@ -63,7 +63,7 @@ pyproject.toml, uv.lock   project and pins (lock is committed)
 src/ss14_autojoin/        server.py (addresses, /status), launcher.py (install discovery), client.py (log
                           parsing, tails), joiner.py (state machine, injected ports), runtime.py (real ports),
                           config.py (TOML settings), app.py (Tkinter window), cli.py, gui_main.py and
-                          cli_main.py (PyInstaller entry scripts, imported by nothing); later notify.py
+                          cli_main.py (PyInstaller entry scripts, imported by nothing), notify.py (sounds)
 tests/                    pytest; fake HTTP server, fixture logs under docs/fixtures/
 docs/                     plan.md, ss14-launcher-reference.md, decisions.md, handoff.md, project-log.md,
                           fixtures/ (real logs from Jacob's machine, redacted)

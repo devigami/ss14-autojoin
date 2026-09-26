@@ -17,6 +17,7 @@ from tkinter import filedialog, messagebox, scrolledtext, ttk
 from .config import Settings, config_path, load, save
 from .joiner import Joiner
 from .launcher import find_launcher, launcher_data_dir, running_launcher_exes
+from .notify import beep
 
 TITLE = "SS14 Auto-Join"
 
@@ -247,6 +248,10 @@ class App:
                     self.joiner = None
                     self.start_button.configure(text="Start watching")
                     self.status.configure(text=message[:80])
+                    self.root.bell()
+                    self.root.lift()
+                if kind == "joined":
+                    threading.Thread(target=beep, args=(3,), daemon=True).start()
         except queue.Empty:
             pass
         self.root.after(200, self._drain)

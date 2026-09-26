@@ -77,6 +77,7 @@ def build_parser() -> argparse.ArgumentParser:
     join.add_argument(
         "--verbose", "-v", action="store_true", help="log what the tool does with the launcher and client"
     )
+    join.add_argument("--quiet", "-q", action="store_true", help="no sound when the join lands or the loop stops")
 
     probe = commands.add_parser(
         "probe", help="show what the tool can see of a running game client (checks the UDP-socket signal)"
@@ -201,6 +202,10 @@ def cmd_join(args: argparse.Namespace) -> int:
     except KeyboardInterrupt:
         print()
         return EXIT_INTERRUPTED
+    if not args.quiet:
+        from .notify import beep  # noqa: PLC0415
+
+        beep(3 if outcome.success else 1)
     return EXIT_OK if outcome.success else EXIT_UNREACHABLE
 
 
