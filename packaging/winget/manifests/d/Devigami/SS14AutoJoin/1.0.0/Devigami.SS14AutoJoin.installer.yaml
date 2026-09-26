@@ -7,6 +7,9 @@ Installers:
 - Architecture: x64
   InstallerUrl: https://github.com/devigami/ss14-autojoin/releases/download/v1.0.0/SS14AutoJoin-1.0.0-windows-x64.exe
   InstallerSha256: 1B5D1C715CC8CC39B29511EA19E2F079650D21C4B58C3F5DE8871528A7C5A73F
-  PortableCommandAlias: SS14AutoJoin
+  # For a bare portable executable winget names the alias after the first Commands entry
+  # (PortableCommandAlias applies only to files inside an archive); without it the file name is used.
+  Commands:
+  - SS14AutoJoin
 ManifestType: installer
 ManifestVersion: 1.10.0

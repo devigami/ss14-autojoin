@@ -33,7 +33,8 @@ def test_winget_manifests_are_valid_yaml_with_the_right_fields() -> None:
     (entry,) = installer["Installers"]
     assert entry["InstallerSha256"] == "AB" * 32
     assert entry["InstallerUrl"].endswith("/releases/download/v1.2.3/SS14AutoJoin-1.2.3-windows-x64.exe")
-    assert entry["PortableCommandAlias"] == "SS14AutoJoin"
+    assert entry["Commands"] == ["SS14AutoJoin"]  # the alias winget creates for a bare portable exe
+    assert "PortableCommandAlias" not in entry  # that field only applies inside archives
     locale = parsed["Devigami.SS14AutoJoin.locale.en-US.yaml"]
     assert locale["ManifestType"] == "defaultLocale" and locale["License"] == "MIT"
     assert len(locale["ShortDescription"]) <= 256

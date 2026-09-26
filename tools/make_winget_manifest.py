@@ -36,7 +36,10 @@ Installers:
 - Architecture: x64
   InstallerUrl: {url}
   InstallerSha256: {sha256.upper()}
-  PortableCommandAlias: SS14AutoJoin
+  # For a bare portable executable winget names the alias after the first Commands entry
+  # (PortableCommandAlias applies only to files inside an archive); without it the file name is used.
+  Commands:
+  - SS14AutoJoin
 ManifestType: installer
 ManifestVersion: {SCHEMA}
 """
