@@ -53,7 +53,17 @@ def build_parser() -> argparse.ArgumentParser:
     join.add_argument("--interval", type=float, default=3.0, help="seconds between polls (default 3, minimum 1)")
     join.add_argument("--margin", type=int, default=0, help="require this many free slots beyond one (default 0)")
     join.add_argument(
-        "--attempt-timeout", type=float, default=45.0, help="seconds to wait for the join after the client starts"
+        "--attempt-timeout",
+        type=float,
+        default=60.0,
+        help="seconds after the client starts until the attempt must be decided (default 60)",
+    )
+    join.add_argument(
+        "--on-unknown",
+        choices=("keep", "retry"),
+        default="keep",
+        help="when nothing shows success or failure by the timeout: keep the client and stop (default), "
+        "or close it and retry",
     )
     join.add_argument("--cooldown", type=float, default=2.0, help="seconds to wait after a failed attempt")
     join.add_argument("--max-attempts", type=int, default=None, help="stop after this many attempts")
@@ -67,6 +77,12 @@ def build_parser() -> argparse.ArgumentParser:
     join.add_argument(
         "--verbose", "-v", action="store_true", help="log what the tool does with the launcher and client"
     )
+
+    probe = commands.add_parser(
+        "probe", help="show what the tool can see of a running game client (checks the UDP-socket signal)"
+    )
+    probe.add_argument("--pid", type=int, default=None, help="client PID (default: the newest SS14.Loader process)")
+    probe.add_argument("--seconds", type=float, default=10.0, help="how long to sample (default 10)")
     return parser
 
 

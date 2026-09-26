@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 
 import pytest
@@ -90,3 +91,15 @@ def test_launcher_command_sets_dotnet_root(tmp_path) -> None:
     argv, env = launcher_command(install, "ss14s://lizard.spacestation14.io/server")
     assert argv == [str(tmp_path / "bin_x64" / "x.exe"), "ss14s://lizard.spacestation14.io/server"]
     assert env["DOTNET_ROOT"] == str(tmp_path / "dotnet_x64")
+
+
+def test_parser_knows_every_command_and_join_flags() -> None:
+    from ss14_autojoin.cli import _COMMANDS, build_parser
+
+    parser = build_parser()
+    subparsers = next(a for a in parser._actions if isinstance(a, argparse._SubParsersAction))
+    assert set(subparsers.choices) == set(_COMMANDS) == {"status", "watch", "doctor", "join", "probe"}
+    args = parser.parse_args(["join", "ss14://host", "--on-unknown", "retry", "--attempt-timeout", "30"])
+    assert args.on_unknown == "retry" and args.attempt_timeout == 30.0
+    assert parser.parse_args(["join", "ss14://host"]).on_unknown == "keep"
+    assert parser.parse_args(["probe", "--seconds", "5"]).seconds == 5.0
