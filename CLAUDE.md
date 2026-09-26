@@ -15,8 +15,8 @@ general SS14 notes and the conventions this project follows; clone it when you n
   2026-09-26 (`launcher.py`, `client.py`, `joiner.py`, `runtime.py`, `join`). First Windows run: discovery,
   slot detection, connect, PID and termination worked; the join was missed because the client log never
   flushes while the client is quiet, and a live client was killed. Fixed with the UDP-socket witness and
-  keep-on-unknown; awaiting the second run (hand-off item 7). Then M3 (`config.py`, Tkinter settings window,
-  `build.py`, Windows CI artifact).
+  keep-on-unknown; **second run joined Lizard end to end (2026-09-26 10:35). M2 verified.** Now M3:
+  `config.py`, Tkinter settings window (`app.py`), `build.py`, Windows CI artifact.
 * **Have from Jacob (2026-09-25)**: a successful and a failed `client.stdout.log` (`docs/fixtures/`). The
   failed one revealed that the launcher does not flush the log while the client is quiet, so failure
   detection is timeout-based (`docs/plan.md`, "Why this detection method").
@@ -28,7 +28,7 @@ general SS14 notes and the conventions this project follows; clone it when you n
 * **Verified 2026-09-26 (evening)**: cold start with a URI works too (launcher starts, logs in, connects in
   about 6 s). Install has `bin_x64` and `dotnet_x64`.
 * **Verified 2026-09-26**: psutil sees the client's UDP socket on Windows (1 connected, 0 rejected).
-* **Waiting on Jacob**: the second `join` run (`docs/handoff.md`, item 7b).
+* **Waiting on Jacob**: nothing for M2; M3 items will be added to `docs/handoff.md` as they need a Windows check.
 * **Works today**: `status`, `watch`, `doctor` (Windows-verified), `join <address>` (Windows-run once, see
   above), `probe` (socket signal check).
 

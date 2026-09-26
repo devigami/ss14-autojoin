@@ -5,8 +5,9 @@ the official launcher connect, exactly as the Connect button would. If the join 
 slot), it closes the failed game client and goes back to watching until you are in.
 
 **Status (2026-09-26):** the full loop exists (`join`): watch the server, connect through the launcher when a
-slot is free, verify from the client log, close a rejected client and try again. Verified piecewise on Jacob's
-machine and with fixtures; the first end-to-end run on Windows is pending. See `docs/plan.md` for the design and
+slot is free, verify from the client log, close a rejected client and try again. Verified end to end on Jacob's
+Windows machine on 2026-09-26 (joined Lizard on the first free slot). A settings window and a Windows
+executable are next. See `docs/plan.md` for the design and
 `docs/handoff.md` for what still needs a Windows machine.
 
 ## Run

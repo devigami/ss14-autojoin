@@ -21,17 +21,8 @@ the repository (`docs/fixtures/`) or the session, and tick the item. Nothing els
 ## Later (M2, M3)
 
 6. Run `uv run ss14-autojoin doctor` on Windows and paste the output (it exists now: detected install, runtime folder, log paths).
-7. **End-to-end run, second try.** The first run (2026-09-26 10:03) found slots and launched correctly but
-   killed a client that had joined, because the client log never flushed. ~~(a) probe~~ **Done 10:31**:
-   `udp_sockets=1` connected, `0` rejected. (b) **The loop again**, when Lizard is near full:
-
-   ```powershell
-   uv run ss14-autojoin join ss14s://lizard.spacestation14.io/server --verbose --max-attempts 3
-   ```
-
-   A join is reported about 15 s after the client starts (from the socket), a rejection after about 12 s, and
-   if neither can be seen the tool stops and leaves the client running with a message naming its PID. Paste
-   the console output.
+7. ~~End-to-end run~~ **Done 2026-09-26 10:35**: slot at 78/80, connect, client PID after 2 s, join confirmed
+   from the UDP socket after 15 s, client left running. Exit code 0.
 8. Named pipe test (optional optimisation): `uv run ss14-autojoin doctor --pipe-test` when it exists. Success:
    the launcher window activates (`:Ping`).
 9. Build the Windows binary with `uv run python build.py` if CI's `windows-latest` job is not used, and run

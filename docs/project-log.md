@@ -102,3 +102,9 @@ Dated entries, newest last. Numbers where there are numbers.
   elevation needed. The join/fail decision no longer depends on the client log flushing. Also fixed a patch
   that had not applied (the `probe` subcommand and `--on-unknown` were missing from the parser) and added a
   test tying the parser's subcommands to the dispatch table.
+
+## 2026-09-26 10:35: first end-to-end join
+
+* `join ss14s://lizard.spacestation14.io/server --verbose --max-attempts 3`: poll `78/80 slot free` → connect
+  command → client PID 32008 after 2 s → `joined (client kept a UDP socket open for 15 s)` → stop, game left
+  running. 17 s from slot to confirmed join. M2 verified on Windows.
