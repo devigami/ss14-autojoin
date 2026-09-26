@@ -141,3 +141,11 @@ Dated entries, newest last. Numbers where there are numbers.
 * `tools/make_icon.py` draws a ring space station (1024 px supersampled, box-filtered to 256/128/64/48/32/16)
   and writes `data/icon.png` and `data/icon.ico` with a pure-Python PNG and ICO writer. The window sets it
   through `iconphoto` (and `iconbitmap` on Windows); `build.py` passes it as the exe icon. 89 tests.
+
+## 2026-09-26: icon not shown in the window; ICO format
+
+* Jacob: the exe's Properties dialog shows the icon, but Explorer's list, the window title bar and the
+  taskbar do not. Explorer is the icon cache (same path as the icon-less build). The window was our bug: Tk's
+  Windows icon reader only understands classic bitmap ICO entries, and the ICO had PNG-compressed ones; the
+  exception was swallowed. Now 256 px stays PNG, the rest are 32-bit bitmaps with an AND mask; the window
+  sets the ICO before the PNG and logs icon failures. Headless Tk (Xvfb) loads the PNG at 256 px.

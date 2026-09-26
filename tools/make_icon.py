@@ -156,6 +156,22 @@ def draw() -> Canvas:
     return c
 
 
+def dib(canvas: Canvas) -> bytes:
+    """Classic ICO entry: BITMAPINFOHEADER + bottom-up 32-bit BGRA pixels + an empty 1-bit AND mask.
+
+    Tk's Windows icon reader (and old Windows code) only understands these; PNG entries are Vista+ only.
+    """
+    size = canvas.size
+    header = struct.pack("<IiiHHIIiiII", 40, size, size * 2, 1, 32, 0, size * size * 4, 0, 0, 0, 0)
+    pixels = bytearray()
+    for y in range(size - 1, -1, -1):
+        for x in range(size):
+            r, g, b, a = canvas.px[y * size + x]
+            pixels += bytes((b, g, r, a))
+    mask_row = ((size + 31) // 32) * 4
+    return header + bytes(pixels) + bytes(mask_row * size)
+
+
 def ico(images: list[tuple[int, bytes]]) -> bytes:
     header = struct.pack("<HHH", 0, 1, len(images))
     offset = 6 + 16 * len(images)
@@ -170,11 +186,13 @@ def ico(images: list[tuple[int, bytes]]) -> bytes:
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     big = draw()
-    pngs = [(size, big.downsample(size).png()) for size in SIZES]
-    (OUT_DIR / "icon.png").write_bytes(pngs[0][1])
-    (OUT_DIR / "icon.ico").write_bytes(ico(pngs))
-    for size, data in pngs:
-        print(f"{size:>3} px: {len(data)} bytes")
+    small = {size: big.downsample(size) for size in SIZES}
+    (OUT_DIR / "icon.png").write_bytes(small[256].png())
+    # 256 px as PNG (Windows Vista+ convention), the rest as classic bitmaps so Tk and every Windows reads them.
+    entries = [(size, small[size].png() if size >= 256 else dib(small[size])) for size in SIZES]
+    (OUT_DIR / "icon.ico").write_bytes(ico(entries))
+    for size, data in entries:
+        print(f"{size:>3} px: {len(data)} bytes ({'png' if size >= 256 else 'bmp'})")
     print(f"wrote {OUT_DIR / 'icon.png'} and {OUT_DIR / 'icon.ico'}")
 
 

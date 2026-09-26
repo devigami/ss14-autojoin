@@ -42,3 +42,11 @@ def test_icon_files_are_bundled() -> None:
     assert (reserved, kind, count) == (0, 1, 6)
     sizes = {struct.unpack("<B", ico[6 + 16 * i : 7 + 16 * i])[0] or 256 for i in range(count)}
     assert sizes == {256, 128, 64, 48, 32, 16}
+    for i in range(count):
+        width, *_rest, length, offset = struct.unpack("<BBBBHHII", ico[6 + 16 * i : 22 + 16 * i])
+        entry = ico[offset : offset + length]
+        if width == 0:
+            assert entry[:8] == b"\x89PNG\r\n\x1a\n"  # 256 px stays PNG
+        else:
+            assert struct.unpack("<I", entry[:4])[0] == 40  # BITMAPINFOHEADER, what Tk reads
+            assert struct.unpack("<H", entry[14:16])[0] == 32
