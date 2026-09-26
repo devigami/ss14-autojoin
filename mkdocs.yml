@@ -35,6 +35,7 @@ nav:
   - Command line: command-line.md
   - Troubleshooting: troubleshooting.md
   - FAQ: faq.md
+  - Privacy: privacy.md
   - Development:
       - Overview: development/index.md
       - Plan and design: development/plan.md
