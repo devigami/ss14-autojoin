@@ -95,3 +95,10 @@ Dated entries, newest last. Numbers where there are numbers.
   behaviour); (2) new witness: the client's open UDP socket count via psutil (0 after a rejection since Lidgren
   peers are shut down, 1 while connected). Joined after 15 s of an open socket, failed after 12 s with none.
   `probe` command to check the signal on Windows. 79 tests.
+
+## 2026-09-26 (day 2, later): the socket witness is real
+
+* `probe` on Windows: connected client `udp_sockets=1` every second, rejected client `udp_sockets=0`, no
+  elevation needed. The join/fail decision no longer depends on the client log flushing. Also fixed a patch
+  that had not applied (the `probe` subcommand and `--on-unknown` were missing from the parser) and added a
+  test tying the parser's subcommands to the dispatch table.

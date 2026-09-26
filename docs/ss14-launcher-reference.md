@@ -360,9 +360,9 @@ Engine `NetManager.ClientConnect.cs`: each connection attempt starts a Lidgren `
 socket (one per candidate address). On failure every peer is shut down (`peer.Shutdown`, `_toCleanNetPeers`)
 and the sockets close; on success the winning peer stays for the whole session. So the client's open UDP
 socket count is 0 after a rejection and at least 1 while connected. The tool reads it with psutil
-(`Process.net_connections(kind="udp")`); **whether Windows lets a non-elevated process read another
-process's UDP table this way is unverified** (`ss14-autojoin probe` checks it, hand-off item 7). The server's
-`/status` player count is corroboration only.
+(`Process.net_connections(kind="udp")`). **Verified on Windows 2026-09-26** with `ss14-autojoin probe`, no
+elevation: a connected client reported `udp_sockets=1` on every sample, a client on the "Failed to connect"
+screen `udp_sockets=0`. The server's `/status` player count is corroboration only.
 
 ## 13. Not verified, and to check on Windows
 
@@ -371,6 +371,5 @@ process's UDP table this way is unverified** (`ss14-autojoin probe` checks it, h
 * Any engine-side rate limit on repeated connection attempts from one address.
 * How long after client exit the flushed log is complete (Jacob copied it some seconds later; the tool should
   poll the file for the `Goodbye` line or give it a few seconds).
-* The UDP socket count of a connected versus a rejected client as seen by psutil on Windows (section 12a).
 * Whether `PipeOptions.CurrentUserOnly` accepts a Python client on the same user account (it should; the
   fallback of invoking `bin_x64\SS14.Launcher.exe <uri>` avoids the question).

@@ -27,8 +27,8 @@ general SS14 notes and the conventions this project follows; clone it when you n
   parsing, process tracking) and `joiner.py`, then the Tkinter settings window (M3, required).
 * **Verified 2026-09-26 (evening)**: cold start with a URI works too (launcher starts, logs in, connects in
   about 6 s). Install has `bin_x64` and `dotnet_x64`.
-* **Waiting on Jacob**: `probe` output (does psutil see the client's UDP socket on Windows?) and the second
-  `join` run (`docs/handoff.md`, item 7).
+* **Verified 2026-09-26**: psutil sees the client's UDP socket on Windows (1 connected, 0 rejected).
+* **Waiting on Jacob**: the second `join` run (`docs/handoff.md`, item 7b).
 * **Works today**: `status`, `watch`, `doctor` (Windows-verified), `join <address>` (Windows-run once, see
   above), `probe` (socket signal check).
 
