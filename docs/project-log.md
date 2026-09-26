@@ -135,3 +135,9 @@ Dated entries, newest last. Numbers where there are numbers.
 
 * Jacob: the fanfare plays from the built window and the setting is respected. The `done` handler still rang
   the Tk bell; removed, the window is only raised.
+
+## 2026-09-26: app icon
+
+* `tools/make_icon.py` draws a ring space station (1024 px supersampled, box-filtered to 256/128/64/48/32/16)
+  and writes `data/icon.png` and `data/icon.ico` with a pure-Python PNG and ICO writer. The window sets it
+  through `iconphoto` (and `iconbitmap` on Windows); `build.py` passes it as the exe icon. 89 tests.

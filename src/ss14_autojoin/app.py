@@ -8,6 +8,7 @@ thread and reports through a queue that the Tk main loop drains. Nothing here is
 from __future__ import annotations
 
 import queue
+import sys
 import threading
 import time
 import tkinter as tk
@@ -81,12 +82,29 @@ class App:
         self.vars: dict[str, tk.Variable] = {}
         root.title(TITLE)
         root.minsize(640, 520)
+        self._set_icon()
         self._build()
         self._fill(settings_to_form(settings))
         if not settings.launcher_dir:
             self.detect_launcher(quiet=True)
         root.after(200, self._drain)
         root.protocol("WM_DELETE_WINDOW", self.close)
+
+    def _set_icon(self) -> None:
+        """Title bar and taskbar icon from the bundled files; silently keep Tk's default if anything fails."""
+        try:
+            from importlib import resources  # noqa: PLC0415
+
+            data = resources.files("ss14_autojoin").joinpath("data")
+            png = Path(str(data.joinpath("icon.png")))
+            if png.is_file():
+                self._icon_image = tk.PhotoImage(file=str(png))  # keep a reference or Tk drops it
+                self.root.iconphoto(True, self._icon_image)
+            ico = Path(str(data.joinpath("icon.ico")))
+            if sys.platform == "win32" and ico.is_file():
+                self.root.iconbitmap(default=str(ico))
+        except Exception:  # noqa: BLE001
+            pass
 
     # -- layout --------------------------------------------------------------------------------------------------
 

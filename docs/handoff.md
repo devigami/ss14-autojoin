@@ -30,3 +30,6 @@ the repository (`docs/fixtures/`) or the session, and tick the item. Nothing els
 10. ~~The executable~~ **Done 2026-09-26**: the window builds and runs.
 11. ~~Sound~~ **Done 2026-09-26**: fanfare plays from the exe, the setting is respected; the extra window bell
     is removed.
+12. **Icon.** After `git pull`: the window's title bar and taskbar should show the ring-station icon
+    (`uv run ss14-autojoin gui`), and a rebuilt `SS14AutoJoin.exe` should carry it in Explorer. Say if it is
+    too dark or too busy at small sizes.

@@ -32,6 +32,8 @@ def build(entry: Path, name: str, console: bool) -> None:
         "--console" if console else "--noconsole",
         "--add-data",
         f"{SRC / 'data'}{os.pathsep}ss14_autojoin/data",
+        "--icon",
+        str(SRC / "data" / "icon.ico"),
     ]
     for module in HIDDEN:
         args += ["--hidden-import", module]
