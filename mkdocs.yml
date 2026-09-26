@@ -1,0 +1,55 @@
+site_name: SS14 Auto-Join
+site_description: Watches a Space Station 14 server and joins it through the official launcher the moment a slot is free.
+site_url: https://devigami.github.io/ss14-autojoin/
+repo_url: https://github.com/devigami/ss14-autojoin
+repo_name: devigami/ss14-autojoin
+edit_uri: edit/master/docs/
+copyright: MIT licensed. Not affiliated with Space Wizards Federation.
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+    - scheme: default
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+  features:
+    - navigation.sections
+    - navigation.footer
+    - content.code.copy
+    - search.suggest
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - How it works: how-it-works.md
+  - Settings: settings.md
+  - Command line: command-line.md
+  - Troubleshooting: troubleshooting.md
+  - FAQ: faq.md
+  - Development:
+      - Overview: development/index.md
+      - Plan and design: development/plan.md
+      - Launcher and engine reference: development/launcher-reference.md
+      - Decisions: development/decisions.md
+      - Verification record: development/verification.md
+      - History: development/history.md
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.details
+
+exclude_docs: |
+  development/fixtures/

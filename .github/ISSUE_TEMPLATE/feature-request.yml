@@ -1,0 +1,23 @@
+name: Feature request
+description: Something the tool should do, or do differently.
+title: "[Feature] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The situation, not the solution. Which server, what happens today, what you would like instead.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal (optional)
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Fair play
+      options:
+        - label: This does not ask the tool to bypass a server's rules or hammer a server faster than a player could by hand.
+          required: true

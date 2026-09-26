@@ -2,7 +2,7 @@
 
 Everything that touches the machine comes in through :class:`Ports`, so the loop runs unchanged against fakes
 in tests and against ``runtime.RealPorts`` on Windows. The design and the reasons behind each timeout are in
-``docs/plan.md`` ("The state machine" and "Why this detection method").
+``docs/development/plan.md`` ("The state machine" and "Why this detection method").
 """
 
 from __future__ import annotations

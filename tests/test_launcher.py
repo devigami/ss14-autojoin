@@ -90,11 +90,12 @@ def test_root_from_launcher_log_uses_newest_launch_command(tmp_path: Path) -> No
         "2026-09-25 10:00:00.000 +10:00 [DBG] Launch command: C:\\old\\bin_x64\\loader\\SS14.Loader.exe [0] x\n"
     )
     (logs / "launcher-20260926.log").write_text(
-        "2026-09-26 08:45:25.646 +10:00 [DBG] Launch command: D:\\SteamLibrary\\steamapps\\common\\Space Station 14 "
-        "Playtest\\bin_x64\\loader\\SS14.Loader.exe [0] C:\\Users\\jacob\\AppData\\Roaming\\Space Station 14\\launcher"
+        "2026-09-26 08:45:25.646 +10:00 [DBG] Launch command: D:\\Games\\SteamLibrary\\steamapps\\common\\"
+        "Space Station 14 Playtest\\bin_x64\\loader\\SS14.Loader.exe [0] "
+        "C:\\Users\\player\\AppData\\Roaming\\Space Station 14\\launcher"
         "\\engines\\290.0.0.zip [1] DA18 [2] D:\\x\\signing_key [3] --username [4] PLAYER\n"
-        "2026-09-26 09:05:27.330 +10:00 [DBG] Launch command: D:\\SteamLibrary\\steamapps\\common\\Space Station 14 "
-        "Playtest\\bin_x64\\loader\\SS14.Loader.exe [0] again\n"
+        "2026-09-26 09:05:27.330 +10:00 [DBG] Launch command: D:\\Games\\SteamLibrary\\steamapps\\common\\"
+        "Space Station 14 Playtest\\bin_x64\\loader\\SS14.Loader.exe [0] again\n"
     )
     root = L.root_from_launcher_log(logs)
     assert root is not None

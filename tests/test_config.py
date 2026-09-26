@@ -9,7 +9,7 @@ from ss14_autojoin.config import Settings, config_path, load, save
 def test_round_trip(tmp_path: Path) -> None:
     path = tmp_path / "cfg" / "config.toml"
     settings = Settings(
-        launcher_dir=r"D:\SteamLibrary\steamapps\common\Space Station 14 Playtest",
+        launcher_dir=r"D:\Games\SteamLibrary\steamapps\common\Space Station 14 Playtest",
         server="ss14s://lizard.spacestation14.io/server",
         interval=2.5,
         margin=1,
@@ -19,7 +19,7 @@ def test_round_trip(tmp_path: Path) -> None:
     )
     save(settings, path)
     text = path.read_text()
-    assert 'launcher_dir = "D:\\\\SteamLibrary\\\\steamapps\\\\common\\\\Space Station 14 Playtest"' in text
+    assert 'launcher_dir = "D:\\\\Games\\\\SteamLibrary\\\\steamapps\\\\common\\\\Space Station 14 Playtest"' in text
     assert "rejoin = true" in text and "interval = 2.5" in text and "max_attempts = 5" in text
     assert load(path) == settings
 

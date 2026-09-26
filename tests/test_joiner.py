@@ -7,7 +7,7 @@ from ss14_autojoin.client import LauncherEvent
 from ss14_autojoin.joiner import Joiner, JoinerConfig, Phase
 from ss14_autojoin.server import ServerAddress, ServerStatus, ServerUnreachable
 
-FIXTURES = Path(__file__).resolve().parent.parent / "docs" / "fixtures"
+FIXTURES = Path(__file__).resolve().parent.parent / "docs" / "development" / "fixtures"
 ADDRESS = ServerAddress.parse("ss14s://lizard.spacestation14.io/server")
 JOINED_LINES = (FIXTURES / "client.stdout.joined.log").read_text().splitlines()
 FULL_LINES = (FIXTURES / "client.stdout.full-after-exit.log").read_text().splitlines()
@@ -235,7 +235,7 @@ def test_rejoin_watches_the_client_and_starts_over() -> None:
 
 
 def test_quiet_log_but_open_socket_counts_as_joined() -> None:
-    # The launcher never flushed the client log (Jacob's run of 2026-09-26), but the client kept its UDP socket.
+    # The launcher never flushed the client log (real run, 2026-09-26), but the client kept its UDP socket.
     ports = FakePorts([status(79)], [{"pid": 33064, "pid_after": 2, "lines": TRUNCATED_LINES, "udp": 1}])
     joiner = make(ports, confirm_after=15)
     outcome = joiner.run()

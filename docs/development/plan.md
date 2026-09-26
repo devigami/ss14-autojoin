@@ -1,11 +1,11 @@
 # Plan: SS14 auto-join
 
 Written 2026-09-25 after reading the launcher, engine and content source (facts in
-`ss14-launcher-reference.md`). Update this file when the design changes; record why in `decisions.md`.
+`launcher-reference.md`). Update this file when the design changes; record why in `decisions.md`.
 
 ## Goal
 
-A tool on Jacob's Windows PC that watches one SS14 server and, the moment a player slot is free, makes the
+A tool on the maintainer's Windows PC that watches one SS14 server and, the moment a player slot is free, makes the
 official launcher connect exactly as the "Connect" button would. If the join fails (the slot was taken, or
 anything else), it closes the failed game client and goes back to watching, until the player is in the game.
 
@@ -19,7 +19,7 @@ anything else), it closes the failed game client and goes back to watching, unti
    itself (§9). Detecting the outcome and cleaning up is the tool's job.
 3. **The cloud session cannot run any of the Windows side.** No launcher, no game, no hub (network policy
    blocks it). Everything that touches them is built behind interfaces, exercised with fakes and fixtures, and
-   verified by Jacob through `handoff.md`.
+   verified by the maintainer through `verification.md`.
 4. **Be a polite client.** Poll `/status` at the launcher's own cadence or slower, never hammer a full server
    with connection attempts, and log everything the tool does.
 
@@ -46,7 +46,7 @@ anything else), it closes the failed game client and goes back to watching, unti
 | `cli.py` | `ss14-autojoin status <address>`, `watch <address>` (poll and print), `join <address>` (the full loop), `servers <filter>` (hub lookup, Windows only), `doctor` (prints detected launcher install, runtime folder, log paths) | yes for parsing and `status`/`watch`/`doctor` |
 | `config.py` | TOML settings file (`%APPDATA%\ss14-autojoin\config.toml`): launcher folder, server address, poll interval, margin, rejoin, restart-launcher flags; defaults filled from discovery | yes |
 | `notify.py` | sound or toast when joined or stuck (later) | partly |
-| `app.py` | Tkinter window over `joiner`: a status line, Start/Stop, and a **settings panel** for the game/launcher folder (with the detected value pre-filled and a Browse button), server address, poll interval, margin, options; writes `config.toml` (**required**, Jacob's request of 2026-09-26) | headless smoke only |
+| `app.py` | Tkinter window over `joiner`: a status line, Start/Stop, and a **settings panel** for the game/launcher folder (with the detected value pre-filled and a Browse button), server address, poll interval, margin, options; writes `config.toml` (**required**, the maintainer's request of 2026-09-26) | headless smoke only |
 
 Configuration: command-line flags first, then a small TOML file (`%APPDATA%\ss14-autojoin\config.toml`) for the
 launcher path and defaults. No secrets are involved: the tool never sees the account token.
@@ -68,7 +68,7 @@ Order of candidates, first hit wins; each is a folder that must hold `bin_x64\SS
    names `Space Station 14 Launcher`, `SS14.Launcher_Windows`, `SS14.Launcher`, `SS14 Launcher`.
 
 The result records the source, the loader exe, and the bundled runtime folder (`dotnet_x64` preferred, any
-`dotnet*` with `dotnet.exe` accepted, since Jacob's Steam install shows `dotnet_x86`). `ss14-autojoin doctor`
+`dotnet*` with `dotnet.exe` accepted, since the maintainer's Steam install shows `dotnet_x86`). `ss14-autojoin doctor`
 prints all of it. The settings window shows the detected path and lets the user override it.
 
 ## The state machine (`joiner.py`)
@@ -133,7 +133,7 @@ and stops the tool by default. After a decided failure the client is terminated 
 ## Cloud versus Windows
 
 Built and tested here: everything in the table above with fakes, plus the `status`/`watch` CLI against a
-local fake server. Needs Jacob (see `handoff.md`): the real launcher path, one real failed and one real
+local fake server. Needs the maintainer (see `verification.md`): the real launcher path, one real failed and one real
 successful `client.stdout.log` to freeze the exact log wording into fixtures, the pipe test, the target server
 address, and the end-to-end run. The Windows executable is built by CI (`windows-latest`) once `build.py`
 exists.
@@ -142,9 +142,9 @@ exists.
 
 1. **M0, this session**: research, this plan, project scaffold, `server.py` with tests, CI. Done when
    `uv run pytest` and `ruff` pass and the branch is pushed.
-2. **M1, watch**: `watcher.py`, `cli.py status|watch`, fixtures, back-off. Jacob can run `ss14-autojoin watch
+2. **M1, watch**: `watcher.py`, `cli.py status|watch`, fixtures, back-off. The maintainer can run `ss14-autojoin watch
    ss14://<server>` on Windows and see slot changes.
-3. **M2, join**: `launcher.py`, `client.py`, `joiner.py`, `cli.py join|doctor`, fixture logs from Jacob. First
+3. **M2, join**: `launcher.py`, `client.py`, `joiner.py`, `cli.py join|doctor`, fixture logs from the maintainer. First
    end-to-end join on Windows.
 4. **M3, app** (code complete 2026-09-26, Windows check pending): `config.py`, the Tkinter window
    (`app.py`, `gui` command, `ss14-autojoin-gui` script), `build.py` (two one-file builds), the Windows CI

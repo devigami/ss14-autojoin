@@ -1,6 +1,6 @@
 [project]
 name = "ss14-autojoin"
-version = "0.1.0"
+version = "1.0.0"
 description = "Watches a Space Station 14 server and joins it through the official launcher as soon as a player slot is free."
 readme = "README.md"
 license = "MIT"
@@ -15,6 +15,7 @@ ss14-autojoin-gui = "ss14_autojoin.app:main"
 
 [dependency-groups]
 dev = [
+    "mkdocs-material>=9.5",
     "pyinstaller>=6.16",
     "pytest>=8",
     "ruff>=0.6",

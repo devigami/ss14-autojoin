@@ -1,7 +1,7 @@
 """Read what the game client and the launcher log, and tail those files.
 
-Line formats and the meaning of each marker are verified against Jacob's logs in ``docs/fixtures/`` and the
-engine source; see ``docs/ss14-launcher-reference.md`` sections 10 and 11a. Nothing here touches processes.
+Line formats and the meaning of each marker are verified against real logs in ``docs/development/fixtures/`` and the
+engine source; see ``docs/development/launcher-reference.md`` sections 10 and 11a. Nothing here touches processes.
 """
 
 from __future__ import annotations

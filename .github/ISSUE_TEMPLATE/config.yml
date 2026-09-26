@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://devigami.github.io/ss14-autojoin/
+    about: Getting started, settings, how it works, troubleshooting.
+  - name: Space Station 14 itself
+    url: https://spacestation14.com/
+    about: Problems with the game or the launcher belong to the Space Wizards, not here.

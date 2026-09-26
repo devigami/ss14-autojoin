@@ -1,9 +1,9 @@
 """Find the launcher installation and describe it.
 
 Everything that touches the machine (environment, file system, registry, processes) is injected so the
-discovery order can be tested on Linux with fake trees. The order, and why, is in ``docs/plan.md``
-("Finding the launcher"); the facts about the layout are in ``docs/ss14-launcher-reference.md`` sections 11
-and 11a.
+discovery order can be tested on Linux with fake trees. The order, and why, is in ``docs/development/plan.md``
+("Finding the launcher"); the facts about the layout are in ``docs/development/launcher-reference.md``
+sections 11 and 11a.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ BIN_DIRS = ("bin_x64", "bin_arm64", "bin")
 """Where the launcher binary lives: ``bin_x64`` on Windows (publish.py), ``bin`` in the Linux tarball."""
 
 STEAM_APP_DIRS = ("Space Station 14 Playtest", "Space Station 14")
-"""Folder names under ``steamapps/common`` (Jacob's install is the Playtest one)."""
+"""Folder names under ``steamapps/common`` (the Steam playtest uses the first)."""
 
 STANDALONE_DIR_NAMES = ("Space Station 14 Launcher", "SS14.Launcher_Windows", "SS14.Launcher", "SS14 Launcher")
 

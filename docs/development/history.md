@@ -1,12 +1,12 @@
-# Project log
+# Development history
 
 Dated entries, newest last. Numbers where there are numbers.
 
 ## 2026-09-25: research, plan, scaffold (M0)
 
-* Read the knowledge base (`devigami/ss14-knowledge`, 7 files) and the source of the launcher (`437fe66`),
+* Read the knowledge base (the SS14 knowledge base, 7 files) and the source of the launcher (`437fe66`),
   engine (`61bbd3f`, sparse) and content (`49b0dca`, sparse). Facts that matter are in
-  `docs/ss14-launcher-reference.md` (13 sections); the design in `docs/plan.md`.
+  `docs/development/launcher-reference.md` (13 sections); the design in `docs/development/plan.md`.
 * Key findings: the launcher takes a `ss14://` URI on its command line and forwards it to a running instance
   over a named pipe; the Windows bootstrap exe drops arguments, so the tool must call `bin_x64\SS14.Launcher.exe`
   with `DOTNET_ROOT` set; the game client stays open on "The server is full!" with a 30 s Retry timer and never
@@ -20,44 +20,44 @@ Dated entries, newest last. Numbers where there are numbers.
 
 ## 2026-09-25 (later): first real logs from Windows
 
-* Jacob supplied `client.stdout.log` for a successful join to Lizard and for a "server is full" attempt
-  (`docs/fixtures/`, redacted). The success log confirms the line wording from the engine source, including
+* The maintainer supplied `client.stdout.log` for a successful join to Lizard and for a "server is full" attempt
+  (`docs/development/fixtures/`, redacted). The success log confirms the line wording from the engine source, including
   the quoted endpoints and the harmless `Disconnected, reason: "Connection attempt failed"` of the losing
   IPv6/IPv4 candidate.
 * The failure log ends before any `net:` line. Cause found in `Connector.PipeOutput`: the launcher writes the
   piped stdout into a `FileStream` with a 4 KiB buffer and never flushes, so a quiet failed client leaves its
   failure lines in memory. Consequence for the design: failure is detected by the absence of the success
   marker within a timeout, then the client is closed and the log read post-mortem (flush on exit unverified;
-  new hand-off item 3).
+  new verification item 3).
 * Checked and ruled out: `SS14_LOG_CLIENT` (unused by the engine), `log.*` cvars (server only), client
   `--loglevel`/`--cvar` flags (only the launcher builds the client command line). Root level is already Debug.
 
 ## 2026-09-25 (later still): the denial, seen
 
-* Jacob repeated the full-server attempt and copied the log after pressing Exit
-  (`docs/fixtures/client.stdout.full-after-exit.log`). The buffer is flushed on client exit. The denial arrives
+* The maintainer repeated the full-server attempt and copied the log after pressing Exit
+  (`docs/development/fixtures/client.stdout.full-after-exit.log`). The buffer is flushed on client exit. The denial arrives
   during the handshake: `Status changed to Disconnected, reason: "{\"reason\":\"Connect denied: The server is
   full!\",\"redial\":false,\"delay\":30}"`, then `Runlevel changed to: Initialize` and an `[ERRO] net: Exception
   during handshake` line with the same JSON. The parser in M2 has real text for both outcomes.
 
 ## 2026-09-26: the launcher log
 
-* Jacob's launcher log (`docs/fixtures/launcher.log`) shows a **Steam** launcher, 0.40.1.0, at
-  `D:\SteamLibrary\steamapps\common\Space Station 14 Playtest`, same layout as the standalone zip, client
+* the reference launcher log (`docs/development/fixtures/launcher.log`) shows a **Steam** launcher, 0.40.1.0, at
+  `<Steam library>\steamapps\common\Space Station 14 Playtest`, same layout as the standalone zip, client
   gets `--cvar branding.steam=true`. Target server confirmed as Lizard, address
   `ss14s://lizard.spacestation14.io/server` (status URL `https://lizard.spacestation14.io/server/status`).
 * The launcher log has timestamps, the client PID (`Setting up manual-pipe logging for new client with PID`)
   and the client's exit (`EOF, ending pipe logging`), so it is the clock for the attempt timeout. Update with a
   cached version takes 1.6 s, with a content download 8.2 s (39 blobs).
-* Decision: proceed with the Steam build; hand-off item 2 (command-line connect) is now the gating test.
+* Decision: proceed with the Steam build; verification item 2 (command-line connect) is now the gating test.
 * Added the Lizard address to the `server.py` test vectors.
 
 ## 2026-09-26 (later): the Steam launcher takes commands; discovery module
 
-* Jacob ran `bin_x64\SS14.Launcher.exe ss14s://lizard.spacestation14.io/server` against the running Steam
+* The maintainer ran `bin_x64\SS14.Launcher.exe ss14s://lizard.spacestation14.io/server` against the running Steam
   launcher: the client started and attempted the join (denied, server full). The gating test passed; the
   join milestone is unblocked. He reports a `dotnet_x86` folder in the install.
-* Jacob asked for (1) a matrix of common install locations checked before asking, (2) a configuration
+* The maintainer asked for (1) a matrix of common install locations checked before asking, (2) a configuration
   window. Both recorded in the plan; the GUI moved into M3 as required.
 * Built `launcher.py`: install description (`LauncherInstall`), runtime folder detection, Steam library
   discovery through `libraryfolders.vdf`, root from the launcher log's `Launch command`, root from a running
@@ -83,14 +83,14 @@ Dated entries, newest last. Numbers where there are numbers.
   timeout with post-mortem ban stops, unknown failures cap, no client appears, dropped command with and
   without restart, offline back-off and max attempts, panic bunker filter and stop, rejoin after kick).
 * `runtime.py`: real ports (subprocess for the launcher command with `DOTNET_ROOT`, psutil for the client
-  process, the two log tails). `join` CLI command wired. 76 tests pass. Hand-off item 7 is the first real run.
+  process, the two log tails). `join` CLI command wired. 76 tests pass. Verification record item 7 is the first real run.
 
 ## 2026-09-26 (day 2): first real run, one wrong kill, the socket witness
 
 * First `join` run on Windows: discovery, slot detection (three attempts, each on a `79/80` poll), the connect
   command, PID pick-up and termination all worked. But the client log never flushed after a successful join
   either (lobby with the rules popup is quiet), the tool saw no success marker in 45 s, and killed a live
-  session. Jacob also read the behaviour as brute force; it was slot-driven, the server hovered at the cap.
+  session. The maintainer also read the behaviour as brute force; it was slot-driven, the server hovered at the cap.
 * Fix: (1) unknown outcome now keeps the client and stops the tool (`--on-unknown retry` restores the old
   behaviour); (2) new witness: the client's open UDP socket count via psutil (0 after a rejection since Lidgren
   peers are shut down, 1 while connected). Joined after 15 s of an open socket, failed after 12 s with none.
@@ -115,25 +115,25 @@ Dated entries, newest last. Numbers where there are numbers.
   Browse/Detect, Start/Stop, Save, scrolling log; joiner in a thread, queue to the main loop), `gui` command
   and `ss14-autojoin-gui` script, `build.py` (PyInstaller one-file: `SS14AutoJoin` window build and
   `ss14-autojoin` console build), CI `windows-app` job uploading both exes on push. Linux console build
-  verified: 17 MB, `--version` and `status` run. 86 tests. Hand-off items 9 and 10 for the Windows check.
+  verified: 17 MB, `--version` and `status` run. 86 tests. Verification record items 9 and 10 for the Windows check.
 
 ## 2026-09-26 10:42: window and exe verified
 
-* Jacob ran the window: detection pre-filled the Steam folder, Save wrote the config, Start joined Lizard
+* The maintainer ran the window: detection pre-filled the Steam folder, Save wrote the config, Start joined Lizard
   (77/80 → PID after 2 s → joined at 15 s) with the log in the window. The PyInstaller window build runs.
   M3 verified. Added `notify.py`: three alert sounds on a join (`--quiet` in the console), a bell and window
   raise when the loop stops.
 
 ## 2026-09-26: join sound option and fanfare
 
-* Jacob asked for a GUI switch for the join sound and a free trumpet success sound. Added `sound` to the
+* The maintainer asked for a GUI switch for the join sound and a free trumpet success sound. Added `sound` to the
   settings and window, `--quiet` stays for the console. `tools/make_fanfare.py` synthesizes
   `data/fanfare.wav` (1.47 s, 127 KB, public domain); `notify.play_success` plays it (winsound on Windows,
   afplay/paplay/aplay elsewhere, bell fallback); PyInstaller bundles the data folder. 88 tests.
 
 ## 2026-09-26: fanfare verified from the exe; window bell removed
 
-* Jacob: the fanfare plays from the built window and the setting is respected. The `done` handler still rang
+* The maintainer: the fanfare plays from the built window and the setting is respected. The `done` handler still rang
   the Tk bell; removed, the window is only raised.
 
 ## 2026-09-26: app icon
@@ -144,7 +144,7 @@ Dated entries, newest last. Numbers where there are numbers.
 
 ## 2026-09-26: icon not shown in the window; ICO format
 
-* Jacob: the exe's Properties dialog shows the icon, but Explorer's list, the window title bar and the
+* The maintainer: the exe's Properties dialog shows the icon, but Explorer's list, the window title bar and the
   taskbar do not. Explorer is the icon cache (same path as the icon-less build). The window was our bug: Tk's
   Windows icon reader only understands classic bitmap ICO entries, and the ICO had PNG-compressed ones; the
   exception was swallowed. Now 256 px stays PNG, the rest are 32-bit bitmaps with an AND mask; the window
@@ -152,7 +152,7 @@ Dated entries, newest last. Numbers where there are numbers.
 
 ## 2026-09-26: icon, round three
 
-* Jacob copied the exe to a new folder: Explorer shows the icon (cache confirmed) and the taskbar shows it
+* The maintainer copied the exe to a new folder: Explorer shows the icon (cache confirmed) and the taskbar shows it
   (from the exe resource). The title bar still did not, in a build predating the diagnostic line. Python
   3.14's bundled Tk is 9.0.4, so Tk's own icon path is suspect. Added a Windows API fallback: after the window
   is mapped, `WM_SETICON` big and small on the frame window via ctypes, logged in the window.
@@ -160,4 +160,17 @@ Dated entries, newest last. Numbers where there are numbers.
 ## 2026-09-26 11:28: icon everywhere
 
 * With the WM_SETICON fallback the title bar shows the icon too. Root cause on record: Tk 9.0.4 on Windows
-  accepts `wm iconbitmap` without applying it to the title bar. Hand-off item 12 closed; nothing is open.
+  accepts `wm iconbitmap` without applying it to the title bar. Verification record item 12 closed; nothing is open.
+
+## 2026-09-26: 1.0.0 release preparation
+
+* Personal names, account ids and machine-specific paths removed from the repository (fixtures use
+  `C:\Users\player`, `D:\Games\SteamLibrary`; documents use `<user>`, `<Steam library>`, "the maintainer").
+* Documentation split: `docs/` is the MkDocs Material user site (getting started, how it works, settings,
+  command line, troubleshooting, FAQ) published to GitHub Pages by `docs.yml`; the development record moved to
+  `docs/development/` (plan, launcher reference, decisions, verification record, history, fixtures).
+* Release automation: `release.yml` publishes `v<version>` with Windows and Linux binaries, checksums and
+  notes generated from merged pull requests (`.github/release.yml` categories) whenever a new version lands
+  on `master`. CI also builds the docs strictly. Issue templates (join problem, launcher not found, other
+  platform, feature request), a pull request template and `CONTRIBUTING.md` added. README rewritten with
+  the Windows-only notice, the documentation link and an AI disclosure. Version 1.0.0.

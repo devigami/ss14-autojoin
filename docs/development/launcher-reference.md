@@ -4,12 +4,11 @@ Platform facts for the auto-join tool, read from source on 2026-09-25. Everythin
 the commits below unless a line says otherwise. When something matters, re-read the code; it is the
 specification.
 
-| Source | Commit | Date | Where the cloud session keeps it |
+| Source | Commit | Date | Local clone used while writing |
 |---|---|---|---|
 | `space-wizards/SS14.Launcher` | `437fe66` | 2026-09-16 | `/home/user/SS14.Launcher` (shallow clone) |
 | `space-wizards/RobustToolbox` (engine) | `61bbd3f` | 2026-09-20 | `/home/user/RobustToolbox` (sparse: `Robust.Shared/Network`, `Robust.Shared/Log`, `Robust.Client/GameController`, `Robust.Server/ServerStatus`) |
 | `space-wizards/space-station-14` (content) | `49b0dca` | 2026-09-25 | `/home/user/space-station-14` (sparse: `Content.Client/Launcher`, `Content.Server/Connection`, `Content.Server/GameTicking`, `Content.Shared/CCVar`) |
-| `devigami/ss14-knowledge` | `d13d43b` | 2026-09-25 | `/home/user/ss14-knowledge` |
 
 ## 1. Server addresses
 
@@ -124,7 +123,7 @@ client's redial works). Any other argument shape sends `:Ping` (activates the wi
 
 **Single instance over a named pipe.** Pipe name `SS14.Launcher.CommandPipe`; on Windows (and Linux without
 `XDG_RUNTIME_DIR`) it is suffixed with `_` + uppercase hex of the UTF-8 user name (`Convert.ToHexString`), so
-for user `jacob` it is `\\.\pipe\SS14.Launcher.CommandPipe_6A61636F62`. On Linux with `XDG_RUNTIME_DIR` the
+for user `player` it is `\\.\pipe\SS14.Launcher.CommandPipe_706C61796572`. On Linux with `XDG_RUNTIME_DIR` the
 pipe is the file `$XDG_RUNTIME_DIR/SS14.Launcher.CommandPipe`; on macOS the plain name. The pipe is created
 with `CurrentUserOnly`, byte mode, one instance. A newly started launcher process first tries to connect to the
 pipe with a **150 ms** timeout; on success it writes the commands joined by `\n` plus a trailing `\n`, prints
@@ -210,7 +209,7 @@ Content `Content.Client/Entry/EntryPoint.cs`, `Content.Client/Launcher/LauncherC
 The engine's root log level is `Debug` (`Robust.Shared/Log/LogManager.cs`); the console handler writes
 `[LEVL] sawmill: message` with levels `VERB`, `DEBG`, `INFO`, `WARN`, `ERRO`, `FATL`, and ANSI colours only
 when stdout is a terminal (not when the launcher redirects it). The network sawmill is `net`. **Verified on
-Windows from Jacob's logs (2026-09-25, `docs/fixtures/client.stdout.joined.log`)**, a successful join reads:
+Windows from the reference logs (2026-09-25, `docs/development/fixtures/client.stdout.joined.log`)**, a successful join reads:
 
 ```
 [DEBG] root: Switching to state Content.Client.Launcher.LauncherConnecting
@@ -235,7 +234,7 @@ Windows from Jacob's logs (2026-09-25, `docs/fixtures/client.stdout.joined.log`)
 Endpoints and reasons are printed in double quotes. With both IPv6 and IPv4 resolved, the losing address logs a
 `Disconnected, reason: "Connection attempt failed"` even on success, so a `Disconnected` line alone is not a
 failure: the failure signature is a `Disconnected` for the **winning** endpoint (or for every endpoint) before
-`Handshake completed`. **Verified on Windows (`docs/fixtures/client.stdout.full-after-exit.log`)**, a "server full" denial reads:
+`Handshake completed`. **Verified on Windows (`docs/development/fixtures/client.stdout.full-after-exit.log`)**, a "server full" denial reads:
 
 ```
 [DEBG] net: "51.81.194.242:1212": Status changed to Connected, reason: "Connected to A3D487E1101CB242"
@@ -253,10 +252,10 @@ that `Disconnected` for the winning endpoint, `Runlevel changed to: Initialize` 
 that the client is silent until the user presses Exit (`[INFO] game: Shutting down! Reason: Exit button pressed`).
 
 **The file lags behind the client (verified in `Connector.PipeOutput`, and in
-`docs/fixtures/client.stdout.full.log`).** The launcher reads the client's stdout pipe in 4096-byte chunks and
+`docs/development/fixtures/client.stdout.full.log`).** The launcher reads the client's stdout pipe in 4096-byte chunks and
 writes them to a `FileStream` opened with a 4096-byte buffer, never calling `Flush`. Bytes reach disk only when
 that buffer fills. A client sitting on "The server is full!" prints almost nothing more, so its connect and
-failure lines can stay in memory indefinitely: Jacob's copy of the log, taken while the client showed the
+failure lines can stay in memory indefinitely: the maintainer's copy of the log, taken while the client showed the
 failure, ends at `Switching to state Content.Client.Launcher.LauncherConnecting`. On client exit the pipe
 reaches EOF and the read loop returns without disposing the stream, yet **the buffer does reach disk on exit**
 (verified: the same attempt copied after pressing Exit was complete). So a post-mortem read after closing the
@@ -304,10 +303,10 @@ Useful launcher log lines: `Connect command: "<uri>", "<reason>"`, `Dropping con
 `Setting up manual-pipe logging for new client with PID <pid>`, `Passed commands to primary launcher` and
 `We are primary launcher (or primary launcher is out for lunch)` (the last two go to the console only).
 
-## 11a. Jacob's actual installation (from `docs/fixtures/launcher.log`, 2026-09-26)
+## 11a. The maintainer's actual installation (from `docs/development/fixtures/launcher.log`, 2026-09-26)
 
 * **Steam build**, launcher version 0.40.1.0, installed at
-  `D:\SteamLibrary\steamapps\common\Space Station 14 Playtest\` with the same layout as the standalone zip:
+  `<Steam library>\steamapps\common\Space Station 14 Playtest\` with the same layout as the standalone zip:
   `bin_x64\`, `bin_x64\loader\SS14.Loader.exe`, `bin_x64\signing_key`. The client gets one extra argument,
   `--cvar branding.steam=true`. The log lines match the open-source launcher code line for line, so the Steam
   fork is the same code plus Steam bits (`ConfigureMultiWindow` says "implemented in private repo for Steam").
@@ -322,7 +321,7 @@ Useful launcher log lines: `Connect command: "<uri>", "<reason>"`, `Dropping con
   `Space Station 14 Launcher.exe`. So the runtime folder is the standard `dotnet_x64`; the tool still accepts
   other `dotnet*` names.
 * Data directories are the standard ones: engines under
-  `C:\Users\jacob\AppData\Roaming\Space Station 14\launcher\engines\290.0.0.zip`.
+  `C:\Users\<user>\AppData\Roaming\Space Station 14\launcher\engines\290.0.0.zip`.
 * **Wizard's Den Lizard** is favourited as `ss14s://lizard.spacestation14.io/server`: status at
   `https://lizard.spacestation14.io/server/status`, game traffic to `udp://lizard.spacestation14.com/`
   (port 1212). Leviathan (`leviathan.spacestation14.com`) is the other favourite. Fork `wizards-testing`,
@@ -340,7 +339,7 @@ Useful launcher log lines: `Connect command: "<uri>", "<reason>"`, `Dropping con
   (`/info` 0.8 s, privacy/version check 0.8 s, engine manifest check against `robust-builds.cdn` 1.5 s) and
   about 8 s more when 39 content blobs had to be downloaded. Cold start of the launcher to `Launch command`:
   5.7 s. Client start to denial is not timestamped in the client log; the failed clients lived 61 s and
-  148 s until Jacob pressed Exit.
+  148 s until the maintainer pressed Exit.
 
 ## 12. Timing constants
 
@@ -369,7 +368,7 @@ screen `udp_sockets=0`. The server's `/status` player count is corroboration onl
 * Whether `players` in `/status` counts players still in the handshake (it uses `PlayerCount`, which counts
   sessions; sessions are created at approval time, so probably yes, but not read).
 * Any engine-side rate limit on repeated connection attempts from one address.
-* How long after client exit the flushed log is complete (Jacob copied it some seconds later; the tool should
+* How long after client exit the flushed log is complete (the maintainer copied it some seconds later; the tool should
   poll the file for the `Goodbye` line or give it a few seconds).
 * Whether `PipeOptions.CurrentUserOnly` accepts a Python client on the same user account (it should; the
   fallback of invoking `bin_x64\SS14.Launcher.exe <uri>` avoids the question).

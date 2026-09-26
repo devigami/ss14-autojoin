@@ -1,7 +1,7 @@
 """The real :class:`~ss14_autojoin.joiner.Ports`: launcher process, log files, game client process.
 
-This is the only module that starts or stops processes. Tested on Jacob's machine through the hand-off; here
-only its pure parts are unit-tested.
+This is the only module that starts or stops processes. Verified on the reference Windows machine; only its pure
+parts are unit-tested.
 """
 
 from __future__ import annotations

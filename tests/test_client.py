@@ -12,7 +12,7 @@ from ss14_autojoin.client import (
     parse_launcher_log,
 )
 
-FIXTURES = Path(__file__).resolve().parent.parent / "docs" / "fixtures"
+FIXTURES = Path(__file__).resolve().parent.parent / "docs" / "development" / "fixtures"
 
 
 def test_joined_fixture() -> None:

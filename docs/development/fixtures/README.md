@@ -1,6 +1,6 @@
 # Fixtures
 
-Real files from Jacob's machine that the tool's parsers are tested against. Player names are replaced
+Real log files from the reference Windows machine (Steam launcher 0.40.1.0, Robust 290.0.0) that the tool's parsers are tested against. Player names are replaced
 (`PLAYER_NAME`, `OTHER_PLAYER`, `CHARACTER`), chat text and the 12 KB OpenGL extension list are removed;
 everything else is verbatim.
 

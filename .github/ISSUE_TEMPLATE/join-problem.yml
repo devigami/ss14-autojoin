@@ -1,0 +1,76 @@
+name: Join problem
+description: The tool watched or connected but did not get you into the server the way it should.
+title: "[Join] "
+labels: [bug, join]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. The log from the window or console is what makes these fixable, so please
+        include it whole. Remove your account name if you prefer; the tool never needs it.
+  - type: dropdown
+    id: what
+    attributes:
+      label: What happened
+      options:
+        - It never attempted to connect although the server had a free slot
+        - It connected but reported no join and left the client running
+        - It closed a game client that had actually joined
+        - It kept retrying although the server refused for another reason
+        - It stopped with "the launcher is showing an error"
+        - Something else (describe below)
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Tool log
+      description: Everything the window or console printed for the run, from "watching …" to the end.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `ss14-autojoin doctor`
+      render: text
+  - type: input
+    id: server
+    attributes:
+      label: Server address
+      placeholder: ss14s://lizard.spacestation14.io/server
+    validations:
+      required: true
+  - type: dropdown
+    id: launcher
+    attributes:
+      label: Launcher edition
+      options: [Steam, Standalone, Other / not sure]
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Operating system and version
+      placeholder: Windows 11 24H2
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: SS14 Auto-Join version
+      placeholder: "1.0.0 (title bar, or ss14-autojoin --version)"
+    validations:
+      required: true
+  - type: textarea
+    id: clientlog
+    attributes:
+      label: Game client log (optional)
+      description: "`%APPDATA%\\Space Station 14\\launcher\\logs\\client.stdout.log`, copied after closing the game client; the lines from `Runlevel changed to: Connecting` onwards are enough."
+      render: text
+  - type: textarea
+    id: launcherlog
+    attributes:
+      label: Launcher log lines (optional)
+      description: "The lines around the attempt from `launcher-YYYYMMDD.log` in the same folder (`Connect command`, `Launch command`, `PID`, `EOF`)."
+      render: text

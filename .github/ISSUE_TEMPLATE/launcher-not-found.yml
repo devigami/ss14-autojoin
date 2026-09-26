@@ -1,0 +1,39 @@
+name: Launcher not found or wrong folder
+description: The tool could not find the launcher installation, or found the wrong one.
+title: "[Detection] "
+labels: [bug, detection]
+body:
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `ss14-autojoin doctor`
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: path
+    attributes:
+      label: Where the launcher actually is
+      description: The folder that contains `bin_x64` (and `Space Station 14 Launcher.exe`).
+      placeholder: E:\Games\Steam\steamapps\common\Space Station 14 Playtest
+    validations:
+      required: true
+  - type: dropdown
+    id: launcher
+    attributes:
+      label: Launcher edition
+      options: [Steam, Standalone, Other / not sure]
+    validations:
+      required: true
+  - type: textarea
+    id: listing
+    attributes:
+      label: Folder listing
+      description: "`dir` of that folder, so the layout can be compared with the expected one."
+      render: text
+  - type: input
+    id: windows
+    attributes:
+      label: Operating system and version
+    validations:
+      required: true

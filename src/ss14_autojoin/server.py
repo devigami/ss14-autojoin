@@ -2,7 +2,7 @@
 
 Mirrors the launcher's ``UriHelper`` (SS14.Launcher, commit 437fe66) so the tool computes the same URLs the
 launcher does, and parses the status JSON the content's ``ServerGameTicker.StatusShell`` produces. Facts and
-test vectors: ``docs/ss14-launcher-reference.md`` sections 1 and 2.
+test vectors: ``docs/development/launcher-reference.md`` sections 1 and 2.
 """
 
 from __future__ import annotations
