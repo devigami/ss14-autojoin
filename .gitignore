@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Real-log fixtures are the point of that folder
+!docs/development/fixtures/*.log

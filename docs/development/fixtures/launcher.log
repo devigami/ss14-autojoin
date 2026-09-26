@@ -1,0 +1,77 @@
+2026-09-26 08:36:00.729 +10:00 [INF] Runtime: .NET 10.0.0 win-x64
+2026-09-26 08:36:00.771 +10:00 [INF] OS: Microsoft Windows 10.0.26200 "X64"
+2026-09-26 08:36:00.773 +10:00 [INF] Launcher version: 0.40.1.0
+2026-09-26 08:36:00.799 +10:00 [INF] SQLite version: 3.40.1
+2026-09-26 08:36:00.799 +10:00 [DBG] Playtest build: false
+2026-09-26 08:36:02.470 +10:00 [DBG] Loading launcher info... SS14.Launcher.Utility.UrlFallbackSet
+2026-09-26 08:36:02.624 +10:00 [INF] Seeking connection to Unspecified/launcher-data.cdn.spacestation14.com:443
+2026-09-26 08:36:03.758 +10:00 [DBG] Launcher out of date? false
+2026-09-26 08:36:03.759 +10:00 [DBG] Refreshing all tokens.
+2026-09-26 08:36:03.761 +10:00 [INF] Seeking connection to Unspecified/auth.spacestation14.com:443
+2026-09-26 08:36:04.439 +10:00 [DBG] Token for PLAYER_NAME/00000000-0000-0000-0000-000000000000 still valid? true
+2026-09-26 08:36:04.440 +10:00 [DBG] Setting status for login PLAYER_NAME/00000000-0000-0000-0000-000000000000 to "Available"
+2026-09-26 08:36:04.444 +10:00 [INF] Seeking connection to Unspecified/lizard.spacestation14.io:443
+2026-09-26 08:36:04.446 +10:00 [INF] Seeking connection to Unspecified/leviathan.spacestation14.com:443
+2026-09-26 08:36:04.451 +10:00 [INF] Seeking connection to Unspecified/hub.spacestation14.com:443
+2026-09-26 08:36:05.231 +10:00 [INF] Seeking connection to Unspecified/lizard.spacestation14.com:443
+2026-09-26 08:45:13.877 +10:00 [INF] Seeking connection to Unspecified/leviathan.spacestation14.com:443
+2026-09-26 08:45:13.881 +10:00 [INF] Seeking connection to Unspecified/lizard.spacestation14.io:443
+2026-09-26 08:45:13.881 +10:00 [INF] Seeking connection to Unspecified/hub.spacestation14.com:443
+2026-09-26 08:45:14.936 +10:00 [INF] Seeking connection to Unspecified/lizard.spacestation14.com:443
+2026-09-26 08:45:17.430 +10:00 [DBG] User has previously accepted privacy policy wizden with version 2025-01-19
+2026-09-26 08:45:17.431 +10:00 [DBG] Committing config to disk, running 1 commands
+2026-09-26 08:45:17.436 +10:00 [DBG] Checking to see if we already have version for fork wizards-testing/49b0dca7538ef3b394255567d7ee9bd97f92c326 ZipHash: DD66ADC69C0BA677AF66F31FCAAA6D1D738537DE86952A785D75832E04B34BA5 ManifestHash: 1D200AA8B13DCAD4EFA70AA378A0CF9B7FE9D1FB86F777FBEF2BAA5CD1A21653
+2026-09-26 08:45:17.444 +10:00 [DBG] Did not find matching version
+2026-09-26 08:45:17.448 +10:00 [DBG] Downloading content manifest from https://wizards.cdn.spacestation14.com/fork/wizards-testing/version/49b0dca7538ef3b394255567d7ee9bd97f92c326/manifest
+2026-09-26 08:45:19.728 +10:00 [DBG] Total of 6654 manifest entries
+2026-09-26 08:45:19.772 +10:00 [DBG] Missing 39 blobs, downloading from https://wizards.cdn.spacestation14.com/fork/wizards-testing/version/49b0dca7538ef3b394255567d7ee9bd97f92c326/download
+2026-09-26 08:45:20.054 +10:00 [DBG] Starting download...
+2026-09-26 08:45:23.062 +10:00 [DBG] ZSTD: 34 ms | SQLite: 90 ms | Blake2B: 17 ms
+2026-09-26 08:45:23.447 +10:00 [DBG] Inserting dependency: Robust 290.0.0
+2026-09-26 08:45:24.031 +10:00 [INF] Seeking connection to Unspecified/robust-builds.cdn.spacestation14.com:443
+2026-09-26 08:45:25.600 +10:00 [DBG] Requested engine version was 290.0.0, redirected to 290.0.0
+2026-09-26 08:45:25.604 +10:00 [INF] Update done!
+2026-09-26 08:45:25.646 +10:00 [DBG] Launch command: D:\Games\SteamLibrary\steamapps\common\Space Station 14 Playtest\bin_x64\loader\SS14.Loader.exe [0] C:\Users\player\AppData\Roaming\Space Station 14\launcher\engines\290.0.0.zip [1] DA18A2D878CB03D20A157EAB4F2B7B30CBB39F72FCAD8C4C8628F36D24330DF517366ADF1F287BA118DA64A7D666C982A9A40A3103E3E91B320C653116002E07 [2] D:\Games\SteamLibrary\steamapps\common\Space Station 14 Playtest\bin_x64\signing_key [3] --username [4] PLAYER_NAME [5] --cvar [6] branding.steam=true [7] --cvar [8] display.compat=False [9] --cvar [10] launch.launcher=true [11] --launcher [12] --connect-address [13] udp://lizard.spacestation14.com/ [14] --ss14-address [15] ss14s://lizard.spacestation14.io/server [16] --cvar [17] build.download_url=https://wizards.cdn.spacestation14.com/fork/wizards-testing/version/49b0dca7538ef3b394255567d7ee9bd97f92c326/file/SS14.Client.zip [18] --cvar [19] build.manifest_url=https://wizards.cdn.spacestation14.com/fork/wizards-testing/version/49b0dca7538ef3b394255567d7ee9bd97f92c326/manifest [20] --cvar [21] build.manifest_download_url=https://wizards.cdn.spacestation14.com/fork/wizards-testing/version/49b0dca7538ef3b394255567d7ee9bd97f92c326/download [22] --cvar [23] build.version=49b0dca7538ef3b394255567d7ee9bd97f92c326 [24] --cvar [25] build.fork_id=wizards-testing [26] --cvar [27] build.hash=DD66ADC69C0BA677AF66F31FCAAA6D1D738537DE86952A785D75832E04B34BA5 [28] --cvar [29] build.manifest_hash=1D200AA8B13DCAD4EFA70AA378A0CF9B7FE9D1FB86F777FBEF2BAA5CD1A21653 [30] --cvar [31] build.engine_version=290.0.0
+2026-09-26 08:45:25.675 +10:00 [DBG] Setting up manual-pipe logging for new client with PID 7136.
+2026-09-26 08:58:24.265 +10:00 [INF] Seeking connection to Unspecified/leviathan.spacestation14.com:443
+2026-09-26 08:58:25.081 +10:00 [INF] Seeking connection to Unspecified/lizard.spacestation14.com:443
+2026-09-26 09:04:19.281 +10:00 [DBG] EOF, ending pipe logging for 7136.
+2026-09-26 09:04:19.281 +10:00 [DBG] EOF, ending pipe logging for 7136.
+2026-09-26 09:05:25.756 +10:00 [DBG] User has previously accepted privacy policy wizden with version 2025-01-19
+2026-09-26 09:05:25.757 +10:00 [DBG] Checking to see if we already have version for fork wizards-testing/49b0dca7538ef3b394255567d7ee9bd97f92c326 ZipHash: DD66ADC69C0BA677AF66F31FCAAA6D1D738537DE86952A785D75832E04B34BA5 ManifestHash: 1D200AA8B13DCAD4EFA70AA378A0CF9B7FE9D1FB86F777FBEF2BAA5CD1A21653
+2026-09-26 09:05:25.757 +10:00 [DBG] Found matching version: 75
+2026-09-26 09:05:25.760 +10:00 [INF] Seeking connection to Unspecified/robust-builds.cdn.spacestation14.com:443
+2026-09-26 09:05:27.324 +10:00 [DBG] Requested engine version was 290.0.0, redirected to 290.0.0
+2026-09-26 09:05:27.324 +10:00 [INF] Update done!
+2026-09-26 09:05:27.330 +10:00 [DBG] Launch command: D:\Games\SteamLibrary\steamapps\common\Space Station 14 Playtest\bin_x64\loader\SS14.Loader.exe [0] C:\Users\player\AppData\Roaming\Space Station 14\launcher\engines\290.0.0.zip [1] DA18A2D878CB03D20A157EAB4F2B7B30CBB39F72FCAD8C4C8628F36D24330DF517366ADF1F287BA118DA64A7D666C982A9A40A3103E3E91B320C653116002E07 [2] D:\Games\SteamLibrary\steamapps\common\Space Station 14 Playtest\bin_x64\signing_key [3] --username [4] PLAYER_NAME [5] --cvar [6] branding.steam=true [7] --cvar [8] display.compat=False [9] --cvar [10] launch.launcher=true [11] --launcher [12] --connect-address [13] udp://lizard.spacestation14.com/ [14] --ss14-address [15] ss14s://lizard.spacestation14.io/server [16] --cvar [17] build.download_url=https://wizards.cdn.spacestation14.com/fork/wizards-testing/version/49b0dca7538ef3b394255567d7ee9bd97f92c326/file/SS14.Client.zip [18] --cvar [19] build.manifest_url=https://wizards.cdn.spacestation14.com/fork/wizards-testing/version/49b0dca7538ef3b394255567d7ee9bd97f92c326/manifest [20] --cvar [21] build.manifest_download_url=https://wizards.cdn.spacestation14.com/fork/wizards-testing/version/49b0dca7538ef3b394255567d7ee9bd97f92c326/download [22] --cvar [23] build.version=49b0dca7538ef3b394255567d7ee9bd97f92c326 [24] --cvar [25] build.fork_id=wizards-testing [26] --cvar [27] build.hash=DD66ADC69C0BA677AF66F31FCAAA6D1D738537DE86952A785D75832E04B34BA5 [28] --cvar [29] build.manifest_hash=1D200AA8B13DCAD4EFA70AA378A0CF9B7FE9D1FB86F777FBEF2BAA5CD1A21653 [30] --cvar [31] build.engine_version=290.0.0
+2026-09-26 09:05:27.333 +10:00 [DBG] Setting up manual-pipe logging for new client with PID 26840.
+2026-09-26 09:06:28.332 +10:00 [DBG] EOF, ending pipe logging for 26840.
+2026-09-26 09:06:28.332 +10:00 [DBG] EOF, ending pipe logging for 26840.
+2026-09-26 09:22:17.579 +10:00 [DBG] Launcher command: r
+2026-09-26 09:22:17.579 +10:00 [DBG] Launcher command: css14s://lizard.spacestation14.io/server
+2026-09-26 09:22:17.581 +10:00 [INF] Connect command: "ss14s://lizard.spacestation14.io/server", ""
+2026-09-26 09:22:17.588 +10:00 [INF] Seeking connection to Unspecified/lizard.spacestation14.io:443
+2026-09-26 09:22:18.399 +10:00 [INF] Seeking connection to Unspecified/lizard.spacestation14.com:443
+2026-09-26 09:22:19.176 +10:00 [DBG] User has previously accepted privacy policy wizden with version 2025-01-19
+2026-09-26 09:22:19.178 +10:00 [DBG] Found matching version: 75
+2026-09-26 09:22:19.180 +10:00 [INF] Seeking connection to Unspecified/robust-builds.cdn.spacestation14.com:443
+2026-09-26 09:22:20.736 +10:00 [DBG] Requested engine version was 290.0.0, redirected to 290.0.0
+2026-09-26 09:22:20.736 +10:00 [INF] Update done!
+2026-09-26 09:22:20.741 +10:00 [DBG] Launch command: D:\Games\SteamLibrary\steamapps\common\Space Station 14 Playtest\bin_x64\loader\SS14.Loader.exe [0] C:\Users\player\AppData\Roaming\Space Station 14\launcher\engines\290.0.0.zip [1] DA18 [2] D:\Games\SteamLibrary\steamapps\common\Space Station 14 Playtest\bin_x64\signing_key [3] --username [4] PLAYER_NAME [5] --cvar [6] branding.steam=true [7] --cvar [8] display.compat=False [9] --cvar [10] launch.launcher=true [11] --launcher [12] --connect-address [13] udp://lizard.spacestation14.com/ [14] --ss14-address [15] ss14s://lizard.spacestation14.io/server [16] --cvar [17] build.engine_version=290.0.0
+2026-09-26 09:22:20.744 +10:00 [DBG] Setting up manual-pipe logging for new client with PID 10640.
+2026-09-26 09:24:48.335 +10:00 [DBG] EOF, ending pipe logging for 10640.
+2026-09-26 09:24:48.335 +10:00 [DBG] EOF, ending pipe logging for 10640.
+2026-09-26 09:34:42.481 +10:00 [INF] Runtime: .NET 10.0.0 win-x64
+2026-09-26 09:34:42.491 +10:00 [INF] Launcher version: 0.40.1.0
+2026-09-26 09:34:42.858 +10:00 [INF] Seeking connection to Unspecified/launcher-data.cdn.spacestation14.com:443
+2026-09-26 09:34:43.174 +10:00 [DBG] Launcher command: r
+2026-09-26 09:34:43.174 +10:00 [DBG] Launcher command: css14s://lizard.spacestation14.io/server
+2026-09-26 09:34:43.799 +10:00 [DBG] Launcher out of date? false
+2026-09-26 09:34:43.801 +10:00 [DBG] Refreshing all tokens.
+2026-09-26 09:34:45.092 +10:00 [DBG] Setting status for login PLAYER_NAME/00000000-0000-0000-0000-000000000000 to "Available"
+2026-09-26 09:34:45.181 +10:00 [INF] Connect command: "ss14s://lizard.spacestation14.io/server", ""
+2026-09-26 09:34:46.650 +10:00 [DBG] User has previously accepted privacy policy wizden with version 2025-01-19
+2026-09-26 09:34:46.660 +10:00 [DBG] Found matching version: 75
+2026-09-26 09:34:48.176 +10:00 [INF] Update done!
+2026-09-26 09:34:48.211 +10:00 [DBG] Launch command: D:\Games\SteamLibrary\steamapps\common\Space Station 14 Playtest\bin_x64\loader\SS14.Loader.exe [0] C:\Users\player\AppData\Roaming\Space Station 14\launcher\engines\290.0.0.zip [1] DA18 [2] D:\Games\SteamLibrary\steamapps\common\Space Station 14 Playtest\bin_x64\signing_key [3] --username [4] PLAYER_NAME [5] --cvar [6] branding.steam=true [7] --cvar [8] display.compat=False [9] --cvar [10] launch.launcher=true [11] --launcher [12] --connect-address [13] udp://lizard.spacestation14.com/ [14] --ss14-address [15] ss14s://lizard.spacestation14.io/server [16] --cvar [17] build.engine_version=290.0.0
+2026-09-26 09:34:48.216 +10:00 [DBG] Setting up manual-pipe logging for new client with PID 17572.
