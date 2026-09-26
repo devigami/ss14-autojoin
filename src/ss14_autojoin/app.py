@@ -90,8 +90,8 @@ class App:
         root.after(200, self._drain)
         root.protocol("WM_DELETE_WINDOW", self.close)
 
-    def _set_icon(self) -> None:
-        """Title bar and taskbar icon from the bundled files; problems go to the log instead of vanishing."""
+    def _set_icon(self, again: bool = False) -> None:
+        """Title bar and taskbar icon from the bundled files; what happened goes to the log."""
         try:
             from importlib import resources  # noqa: PLC0415
 
@@ -100,15 +100,21 @@ class App:
             png = Path(str(data.joinpath("icon.png")))
             done = []
             if sys.platform == "win32" and ico.is_file():
-                # -default also covers the taskbar and any later toplevel (message boxes).
-                self.root.iconbitmap(default=str(ico))
+                self.root.iconbitmap(str(ico))  # this window
+                self.root.iconbitmap(default=str(ico))  # and every later toplevel (message boxes)
                 done.append("ico")
-            if png.is_file():
+            elif png.is_file():
                 self._icon_image = tk.PhotoImage(file=str(png))  # keep a reference or Tk drops it
                 self.root.iconphoto(True, self._icon_image)
                 done.append("png")
-            if not done:
-                self.append("log", f"icon files not found under {data}")
+            if not again:
+                tk_version = self.root.tk.call("info", "patchlevel")
+                if done:
+                    self.append("log", f"icon set ({', '.join(done)}) from {data} with Tk {tk_version}")
+                    # Windows sometimes applies a pre-map icon only after the window exists; do it once more.
+                    self.root.after(600, lambda: self._set_icon(again=True))
+                else:
+                    self.append("log", f"icon files not found under {data} (Tk {tk_version})")
         except Exception as e:  # noqa: BLE001
             self.append("log", f"icon could not be set: {e!r}")
 
