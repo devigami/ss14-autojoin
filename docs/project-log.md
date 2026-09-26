@@ -149,3 +149,10 @@ Dated entries, newest last. Numbers where there are numbers.
   Windows icon reader only understands classic bitmap ICO entries, and the ICO had PNG-compressed ones; the
   exception was swallowed. Now 256 px stays PNG, the rest are 32-bit bitmaps with an AND mask; the window
   sets the ICO before the PNG and logs icon failures. Headless Tk (Xvfb) loads the PNG at 256 px.
+
+## 2026-09-26: icon, round three
+
+* Jacob copied the exe to a new folder: Explorer shows the icon (cache confirmed) and the taskbar shows it
+  (from the exe resource). The title bar still did not, in a build predating the diagnostic line. Python
+  3.14's bundled Tk is 9.0.4, so Tk's own icon path is suspect. Added a Windows API fallback: after the window
+  is mapped, `WM_SETICON` big and small on the frame window via ctypes, logged in the window.

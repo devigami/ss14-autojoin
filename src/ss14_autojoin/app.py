@@ -107,14 +107,18 @@ class App:
                 self._icon_image = tk.PhotoImage(file=str(png))  # keep a reference or Tk drops it
                 self.root.iconphoto(True, self._icon_image)
                 done.append("png")
+            if again and sys.platform == "win32" and ico.is_file():
+                done.append(_windows_set_window_icon(self.root, ico))
             if not again:
                 tk_version = self.root.tk.call("info", "patchlevel")
                 if done:
                     self.append("log", f"icon set ({', '.join(done)}) from {data} with Tk {tk_version}")
-                    # Windows sometimes applies a pre-map icon only after the window exists; do it once more.
+                    # Windows applies some icon paths only once the window exists; do it again, then directly.
                     self.root.after(600, lambda: self._set_icon(again=True))
                 else:
                     self.append("log", f"icon files not found under {data} (Tk {tk_version})")
+            elif done and done[-1].startswith("winapi"):
+                self.append("log", f"icon applied through the Windows API ({done[-1]})")
         except Exception as e:  # noqa: BLE001
             self.append("log", f"icon could not be set: {e!r}")
 
@@ -301,3 +305,35 @@ def main() -> int:
     App(root, load(path), path)
     root.mainloop()
     return 0
+
+
+def _windows_set_window_icon(root: tk.Tk, ico: Path) -> str:
+    """Set the title-bar icons of the Tk toplevel's frame window with WM_SETICON. Windows only. Returns a note."""
+    import ctypes  # noqa: PLC0415
+    from ctypes import wintypes  # noqa: PLC0415
+
+    user32 = ctypes.windll.user32  # type: ignore[attr-defined]
+    user32.GetParent.restype = wintypes.HWND
+    user32.GetParent.argtypes = [wintypes.HWND]
+    user32.LoadImageW.restype = wintypes.HANDLE
+    user32.LoadImageW.argtypes = [
+        wintypes.HINSTANCE,
+        wintypes.LPCWSTR,
+        wintypes.UINT,
+        ctypes.c_int,
+        ctypes.c_int,
+        wintypes.UINT,
+    ]
+    user32.SendMessageW.restype = ctypes.c_ssize_t
+    user32.SendMessageW.argtypes = [wintypes.HWND, wintypes.UINT, ctypes.c_size_t, ctypes.c_ssize_t]
+    IMAGE_ICON, LR_LOADFROMFILE, WM_SETICON, ICON_SMALL, ICON_BIG = 1, 0x10, 0x80, 0, 1
+    # Tk's toplevel is a child of the real frame window that owns the title bar.
+    inner = wintypes.HWND(root.winfo_id())
+    frame = user32.GetParent(inner) or inner
+    big = user32.LoadImageW(None, str(ico), IMAGE_ICON, 32, 32, LR_LOADFROMFILE)
+    small = user32.LoadImageW(None, str(ico), IMAGE_ICON, 16, 16, LR_LOADFROMFILE)
+    if not big or not small:
+        return f"winapi: LoadImage failed (error {ctypes.get_last_error()})"
+    user32.SendMessageW(frame, WM_SETICON, ICON_BIG, big)
+    user32.SendMessageW(frame, WM_SETICON, ICON_SMALL, small)
+    return "winapi: WM_SETICON sent"
