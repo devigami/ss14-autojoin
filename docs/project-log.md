@@ -130,3 +130,8 @@ Dated entries, newest last. Numbers where there are numbers.
   settings and window, `--quiet` stays for the console. `tools/make_fanfare.py` synthesizes
   `data/fanfare.wav` (1.47 s, 127 KB, public domain); `notify.play_success` plays it (winsound on Windows,
   afplay/paplay/aplay elsewhere, bell fallback); PyInstaller bundles the data folder. 88 tests.
+
+## 2026-09-26: fanfare verified from the exe; window bell removed
+
+* Jacob: the fanfare plays from the built window and the setting is respected. The `done` handler still rang
+  the Tk bell; removed, the window is only raised.

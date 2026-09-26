@@ -29,7 +29,7 @@ general SS14 notes and the conventions this project follows; clone it when you n
 * **Verified 2026-09-26 (evening)**: cold start with a URI works too (launcher starts, logs in, connects in
   about 6 s). Install has `bin_x64` and `dotnet_x64`.
 * **Verified 2026-09-26**: psutil sees the client's UDP socket on Windows (1 connected, 0 rejected).
-* **Waiting on Jacob**: the fanfare from the built exe (hand-off item 11); the merge/release decision.
+* **Waiting on Jacob**: the merge/release decision (everything in the hand-off is done).
 * **Works today** (all Windows-verified): `status`, `watch`, `doctor`, `join`, `probe`, `gui`, and the
   PyInstaller builds.
 

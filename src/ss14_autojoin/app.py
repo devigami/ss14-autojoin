@@ -251,7 +251,6 @@ class App:
                     self.joiner = None
                     self.start_button.configure(text="Start watching")
                     self.status.configure(text=message[:80])
-                    self.root.bell()
                     self.root.lift()
                 if kind == "joined" and self.settings.sound:
                     threading.Thread(target=play_success, daemon=True).start()
