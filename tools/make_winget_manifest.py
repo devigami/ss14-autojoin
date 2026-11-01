@@ -13,7 +13,10 @@ from datetime import date
 from pathlib import Path
 
 IDENTIFIER = "Devigami.SS14AutoJoin"
-SCHEMA = "1.10.0"
+# Manifest schema version. winget-pkgs deprecates old versions and its bot rejects submissions that use one
+# ("This manifest version has been depreciated. Please use version X"); the current list is the folder
+# names under doc/manifest/schema/ in microsoft/winget-pkgs. Bump this, regenerate, and the tests follow.
+SCHEMA = "1.28.0"
 REPO = "https://github.com/devigami/ss14-autojoin"
 ROOT = Path(__file__).resolve().parents[1]
 
