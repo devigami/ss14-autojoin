@@ -32,6 +32,12 @@ weeks and was then told "This manifest version has been depreciated. Please use 
    Do not open a second pull request: duplicates are closed.
 3. The bots re-run validation on the new commit and clear `Needs-Author-Feedback`; a moderator then merges.
 
+If validation then fails with `SchemaHeaderManifestVersionMismatch` and `SchemaHeaderUrlPatternMismatch`
+for each file, the comment line was left behind: winget-cli (`ManifestSchemaValidation.cpp`) reads the
+version out of the header URL, compares it with `ManifestVersion`, and compares the whole URL with the
+schema's `$id` (case-insensitively, so `defaultLocale` and `defaultlocale` both pass). Both lines must say
+the new version; a `# Created using wingetcreate` line above them is fine.
+
 ## Later versions (automatic)
 
 `release.yml` has a `winget` job that runs `vedantmgoyal9/winget-releaser` after each release. It needs a

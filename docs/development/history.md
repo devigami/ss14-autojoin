@@ -193,3 +193,7 @@ Dated entries, newest last. Numbers where there are numbers.
   field and keep every field the package uses, so the fix is the declared version only. Generator, committed
   manifests and tests moved to 1.28.0 (validated against the downloaded schemas); the packaging README records
   how to update an open pull request in place rather than opening a new one.
+* First in-place attempt changed only the `ManifestVersion` fields; validation failed with
+  `SchemaHeaderManifestVersionMismatch` and `SchemaHeaderUrlPatternMismatch` because the
+  `# yaml-language-server: $schema=` comment still named 1.10.0 (winget-cli checks the header URL against
+  the field and the schema `$id`). Recorded in the packaging README.
