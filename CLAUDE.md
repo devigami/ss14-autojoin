@@ -16,8 +16,11 @@ happened, newest last), `docs/development/verification.md` (what was checked on 
   builds Windows and Linux binaries and publishes `v<version>` with generated notes. `docs.yml` publishes the
   MkDocs site to GitHub Pages on changes under `docs/`.
 * **Untested**: Linux and macOS joining, the standalone (non-Steam) launcher. Issue templates ask for the logs.
-* **Signing**: not yet; SignPath Foundation application in progress. Windows builds carry a version resource;
-  a winget package is prepared (`packaging/winget/`), first submission by hand, later ones by `release.yml`.
+* **Signing**: not yet; SignPath Foundation wants proof of popularity, so a paid route (Microsoft Artifact
+  Signing) is under consideration. Windows builds carry a version resource. The winget package
+  (`packaging/winget/`, manifest schema 1.28.0) is submitted as `microsoft/winget-pkgs` PR 441430, waiting
+  on the maintainer to bump the schema on the PR branch after the bot deprecated 1.10.0; later versions go
+  through `release.yml` once the package exists.
 
 ## Stack and commands
 

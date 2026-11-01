@@ -39,7 +39,13 @@ def test_winget_manifests_are_valid_yaml_with_the_right_fields() -> None:
     assert locale["ManifestType"] == "defaultLocale" and locale["License"] == "MIT"
     assert len(locale["ShortDescription"]) <= 256
     for doc in parsed.values():
-        assert doc["PackageIdentifier"] == "Devigami.SS14AutoJoin" and doc["ManifestVersion"] == "1.10.0"
+        assert doc["PackageIdentifier"] == "Devigami.SS14AutoJoin" and doc["ManifestVersion"] == mod.SCHEMA
+    # winget-pkgs rejected 1.10.0 as deprecated in 2026-10 (PR microsoft/winget-pkgs#441430); never go back.
+    assert tuple(int(n) for n in mod.SCHEMA.split(".")) >= (1, 28, 0)
+    for text in files.values():
+        header = text.splitlines()[0]
+        assert header.startswith("# yaml-language-server: $schema=https://aka.ms/winget-manifest.")
+        assert header.endswith(f".{mod.SCHEMA}.schema.json")
 
 
 def test_checked_in_manifest_for_1_0_0_matches_the_generator() -> None:

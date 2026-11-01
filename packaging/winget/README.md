@@ -17,6 +17,21 @@ prompt, because the file never carries the browser's mark of the web.
    `winget install --manifest manifests/d/Devigami/SS14AutoJoin/1.0.0`.
 2. The winget bots check the URL, the hash and the schema; a moderator merges. Expect a few days.
 
+## If the bot says the manifest version is deprecated
+
+`winget-pkgs` retires manifest schema versions while a pull request waits (the 1.0.0 submission sat for five
+weeks and was then told "This manifest version has been depreciated. Please use version 1.28.0", label
+`Manifest-Version-Deprecated`). Nothing about the package changes; only the declared schema does:
+
+1. Set `SCHEMA` in `tools/make_winget_manifest.py` to the version the bot named (the current list is the
+   folder names under `doc/manifest/schema/` in `microsoft/winget-pkgs`), regenerate with the same version,
+   hash and release date, and run the tests.
+2. In the fork, on the pull request's branch, change the two schema lines of each of the three files
+   (the `# yaml-language-server` comment and `ManifestVersion`) to the same version. The GitHub web editor on
+   the pull request's "Files changed" tab is enough; pushing to that branch updates the open pull request.
+   Do not open a second pull request: duplicates are closed.
+3. The bots re-run validation on the new commit and clear `Needs-Author-Feedback`; a moderator then merges.
+
 ## Later versions (automatic)
 
 `release.yml` has a `winget` job that runs `vedantmgoyal9/winget-releaser` after each release. It needs a
