@@ -102,8 +102,10 @@ build.py                  PyInstaller --onefile builds (window and console)
 * Patches that anchor on source lines can silently miss after `ruff format`; assert the anchor matched.
 * The window build is a GUI-subsystem program: `sys.stdout` is `None` unless the caller redirected it, and
   a shell does not wait for it. Anything it must say on the command line goes through `console.emit`.
+  PowerShell waits only when something follows it in the pipeline (`app | Out-String` works, `$v = app` is
+  empty and closes the pipe), so `emit` writes unbuffered: text left in a buffer fails again at exit.
 * A PyInstaller build that finishes is not a build that starts. `uv python install 3.14` gives whatever
-  patch release that uv knows (3.14.6 in a container with a stale uv, 3.14.7 or later on the CI runners), and
+  patch release that uv knows (3.14.6 in a container with a stale uv, 3.14.10 on the CI runners), and
   on Linux the `_tkinter` of 3.14.6 has no RPATH: PyInstaller logs "Library not found: libtcl9.0.so" as a
   warning, finishes, and the window build dies on import. `build.tcl_tk_libraries` names the files; a build
   is not good until `tools/smoke_version.py` has started it.

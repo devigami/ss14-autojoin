@@ -240,5 +240,12 @@ Dated entries, newest last. Numbers where there are numbers.
 * User documentation: winget is the recommended install; the download path, the unsigned-file prompt,
   updating and finding the installed version are described; the stale "once accepted" and "SignPath in
   progress" statements are gone. Release asset names in the docs now match the real ones.
+* The Windows runner then corrected the first draft of the documentation. Capturing through a pipe and the
+  piped PowerShell and Command Prompt forms print the version, but `$v = SS14AutoJoin --version` returns
+  at once with nothing: PowerShell waits for a windowed program only when something follows it in the
+  pipeline. The abandoned process also complained at exit, because the line was still in Python's buffer
+  when the pipe closed. `console.emit` now writes straight to the file descriptor, the smoke check runs the
+  window build once more with a pipe nobody reads, and the documentation gives only the forms the runner
+  proved. The runners use Python 3.14.10, which does not have the Tcl/Tk defect of the container's 3.14.6.
 * The version stays 1.0.0 in this change. Bumping it is what publishes a release, and that waits for the
   maintainer's checks on Windows and the decision on signing.
