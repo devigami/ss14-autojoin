@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import os
 import subprocess
 import sys
 
@@ -62,6 +63,38 @@ def test_a_broken_stream_falls_through_to_the_handles() -> None:
     api = FakeConsole(handle=True)
     assert emit("x", stream=BrokenStream(), platform="win32", api=api) == "handle"
     assert emit("x", stream=BrokenStream(), platform="linux") == "none"
+
+
+def test_a_real_descriptor_gets_the_line_directly() -> None:
+    read_fd, write_fd = os.pipe()
+    with os.fdopen(write_fd, "w") as out, os.fdopen(read_fd, "rb") as back:
+        assert emit("SS14 Auto-Join 9.9.9", stream=out, platform="linux") == "stdout"
+        assert os.read(back.fileno(), 100) == ("SS14 Auto-Join 9.9.9" + os.linesep).encode()
+
+
+def test_a_pipe_nobody_reads_leaves_nothing_buffered() -> None:
+    read_fd, write_fd = os.pipe()
+    os.close(read_fd)  # the caller stopped listening before the answer came
+    out = os.fdopen(write_fd, "w")
+    api = FakeConsole(parent=True)
+    assert emit("SS14 Auto-Join 9.9.9", stream=out, platform="win32", api=api) == "console"
+    out.close()  # would raise if the line were still sitting in the buffer
+
+
+def test_window_version_is_silent_and_successful_when_the_caller_stops_listening() -> None:
+    """Real processes on every platform: the answer is lost, which must not become an error or a message."""
+    code = "import sys; sys.stdin.readline(); from ss14_autojoin.app import main; raise SystemExit(main(['--version']))"
+    child = subprocess.Popen(
+        [sys.executable, "-c", code], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    assert child.stdin is not None and child.stdout is not None and child.stderr is not None
+    child.stdout.close()  # stop listening, then let the child go ahead
+    child.stdin.write(b"\n")
+    child.stdin.close()
+    stderr = child.stderr.read()
+    child.stderr.close()
+    assert child.wait(timeout=60) == 0, stderr
+    assert b"Exception" not in stderr and b"Error" not in stderr, stderr
 
 
 def test_window_version_flag_prints_and_never_opens_a_window(

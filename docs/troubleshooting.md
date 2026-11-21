@@ -60,8 +60,9 @@ when they start. Open a new terminal window. `winget list Devigami.SS14AutoJoin`
 ## `SS14AutoJoin --version` prints late, or nothing
 
 That is how Windows treats a windowed program started from a terminal: the shell does not wait for it. Pipe
-the output (`SS14AutoJoin --version | Out-Host`) or read the version from the title bar. Versions before
-1.0.1 ignore the flag and open the window. Details in [Command line](command-line.md#which-version).
+the output (`SS14AutoJoin --version | Out-Host`, or `| Out-String` to capture it; a plain
+`$v = SS14AutoJoin --version` stays empty) or read the version from the title bar. Versions before 1.0.1
+ignore the flag and open the window. Details in [Command line](command-line.md#which-version).
 
 ## The icon looks wrong in Explorer
 

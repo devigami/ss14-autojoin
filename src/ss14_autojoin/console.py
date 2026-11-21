@@ -5,7 +5,10 @@ GUI-subsystem program. Started from a terminal, such a program has no console of
 ``sys.stdout`` is ``None``: a plain ``print`` shows nothing. Three routes exist, tried in this order:
 
 1. ``sys.stdout``, when Python has one: the console build, running from source, Linux and macOS, and output
-   the caller captured in a way Python can see.
+   the caller captured in a way Python can see. The bytes go straight to the file descriptor, because a
+   caller may have stopped listening (PowerShell does not wait for a windowed program in
+   ``$v = SS14AutoJoin --version`` and closes its end of the pipe): text left in Python's buffer would then
+   fail again when the interpreter exits, with an "Exception ignored while flushing sys.stdout" message.
 2. The process's standard output handle, when the caller redirected it (a pipe or a file) but Python made
    no stream for it.
 3. The console of the parent process, which is the terminal the command was typed in, attached for the
@@ -18,6 +21,7 @@ a fake. :class:`WindowsConsole` is the real one; what it does on a real machine 
 
 from __future__ import annotations
 
+import os
 import sys
 from types import EllipsisType
 from typing import Protocol, TextIO
@@ -44,14 +48,8 @@ def emit(
     listening (started from a shortcut, say). ``stream`` defaults to ``sys.stdout`` as it is at call time.
     """
     out = sys.stdout if stream is ... else stream
-    if out is not None:
-        try:
-            out.write(text + "\n")
-            out.flush()
-        except OSError, ValueError:
-            pass  # a closed or broken stream: try the handles
-        else:
-            return "stdout"
+    if out is not None and _write_stream(out, text):
+        return "stdout"
     if platform != "win32":
         return "none"
     try:
@@ -63,6 +61,24 @@ def emit(
     except OSError:
         pass
     return "none"
+
+
+def _write_stream(out: TextIO, text: str) -> bool:
+    """Write one line to a Python stream. False when it could not be delivered, with nothing left buffered."""
+    try:
+        fd = out.fileno()
+    except AttributeError, OSError, ValueError:
+        fd = None  # an in-memory stream, as in tests: no descriptor, and nothing that can break
+    try:
+        if fd is None:
+            out.write(text + "\n")
+            out.flush()
+        else:
+            out.flush()  # anything written earlier goes first
+            os.write(fd, (text + os.linesep).encode("utf-8", "replace"))
+    except OSError, ValueError:
+        return False  # closed, or a pipe nobody reads any more: try the handles
+    return True
 
 
 class WindowsConsole:

@@ -43,15 +43,15 @@ jobs:
       - name: The forms the documentation gives for a terminal print the version
         shell: pwsh
         run: |
-          $captured = .\dist\SS14AutoJoin.exe --version
-          "PowerShell, captured: '$captured'"
-          $piped = (.\dist\SS14AutoJoin.exe --version | Out-String).Trim()
-          "PowerShell, piped:    '$piped'"
+          # PowerShell waits for a windowed program only when something follows it in the pipeline. A bare
+          # `$v = SS14AutoJoin --version` returns at once with nothing (seen on this runner), so the
+          # documentation gives the piped forms, and these are the ones checked here.
+          $piped = .\dist\SS14AutoJoin.exe --version | Out-String
+          "PowerShell, piped and captured: '$($piped.Trim())'"
           $viaCmd = (cmd /c "dist\SS14AutoJoin.exe --version | more" | Out-String).Trim()
-          "Command Prompt pipe:  '$viaCmd'"
-          if ($captured -notmatch '^SS14 Auto-Join \d+\.\d+\.\d+$') { throw "the captured form printed something else" }
-          if ($piped -ne $captured) { throw "the piped form printed something else" }
-          if ($viaCmd -ne $captured) { throw "the Command Prompt form printed something else" }
+          "Command Prompt, piped:          '$viaCmd'"
+          if ($piped.Trim() -notmatch '^SS14 Auto-Join \d+\.\d+\.\d+$') { throw "the PowerShell form printed something else" }
+          if ($viaCmd -ne $piped.Trim()) { throw "the Command Prompt form printed something else" }
       - uses: actions/upload-artifact@v7
         with:
           name: SS14AutoJoin-windows

@@ -28,9 +28,12 @@ after it; and nothing is printed at all when it is started from a shortcut. Pipi
 puts the output where you expect it:
 
 ```powershell
-SS14AutoJoin --version | Out-Host          # PowerShell
-$version = SS14AutoJoin --version          # PowerShell, captured into a variable
+SS14AutoJoin --version | Out-Host                  # PowerShell: wait for it and show the line
+$version = SS14AutoJoin --version | Out-String     # PowerShell: capture it
 ```
+
+A plain `$version = SS14AutoJoin --version` stays empty, because PowerShell only waits for a windowed program
+when something follows it in the pipeline.
 
 ```bat
 SS14AutoJoin --version | more
