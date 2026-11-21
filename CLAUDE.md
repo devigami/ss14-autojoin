@@ -16,11 +16,15 @@ happened, newest last), `docs/development/verification.md` (what was checked on 
   builds Windows and Linux binaries and publishes `v<version>` with generated notes. `docs.yml` publishes the
   MkDocs site to GitHub Pages on changes under `docs/`.
 * **Untested**: Linux and macOS joining, the standalone (non-Steam) launcher. Issue templates ask for the logs.
+* **1.0.1 in progress, not released**: the version is still 1.0.0 everywhere on purpose, because the bump is
+  the release trigger. Done so far: `SS14AutoJoin --version` (window build, through `console.py`), the
+  version in the title bar, user docs that recommend winget, start-up smoke checks for every build in CI and
+  before a release, the Linux Tcl/Tk bundling fix, the winget fork owner from a repository variable.
+  Still to check by hand on Windows before releasing: see "Not verified" in `verification.md`.
 * **winget**: `Devigami.SS14AutoJoin` 1.0.0 is in `microsoft/winget-pkgs` (PR 441430, merged 2026-11). Its
   manifest pins the SHA-256 of the 1.0.0 release asset, so that asset must never be replaced or re-signed.
-  Later versions go through the `winget` job in `release.yml`, which needs the `WINGET_TOKEN` secret.
-  The reviewer's optional notes for the next version: make `SS14AutoJoin --version` print the version, and
-  sign the binary. User docs still describe winget as pending.
+  Later versions go through the `winget` job in `release.yml`, which needs the `WINGET_TOKEN` secret and the
+  `WINGET_FORK_USER` variable (the account that owns the `winget-pkgs` fork).
 * **Signing**: not yet, and no longer blocking: a winget install shows no SmartScreen prompt (read from the
   winget client source, not yet run on Windows; see `packaging/winget/README.md`). Direct downloads still
   warn. SignPath Foundation wants proof of popularity; the paid route under consideration is Microsoft
@@ -39,6 +43,7 @@ uv run ruff check --fix . && uv run ruff format .      # lint and format (CI run
 uv run mkdocs build --strict                           # docs must build cleanly (CI checks)
 uv run ss14-autojoin status|watch|join|doctor|probe|gui
 uv run python build.py [--cli]                         # one-file exe into dist/ (window, or console tool)
+uv run python tools/smoke_version.py dist/<exe> ...    # a built exe must start and print this version
 uv run python tools/make_fanfare.py                    # regenerate the join sound
 uv run python tools/make_icon.py                       # regenerate the icon
 ```
@@ -56,12 +61,14 @@ mkdocs.yml, docs/         the user documentation site; docs/development/ holds t
 src/ss14_autojoin/        server.py (addresses, /status), launcher.py (install discovery), client.py (log
                           parsing, tails), joiner.py (state machine, injected ports), runtime.py (real ports),
                           config.py (TOML settings), app.py (Tkinter window), notify.py (sounds), cli.py,
+                          console.py (printing from the windowed build: stdout, std handle, parent console),
                           gui_main.py and cli_main.py (PyInstaller entry scripts, imported by nothing),
                           data/ (fanfare.wav, icon.png, icon.ico; generated, public domain)
-tools/                    make_fanfare.py, make_icon.py, make_winget_manifest.py
+tools/                    make_fanfare.py, make_icon.py, make_winget_manifest.py, smoke_version.py
 packaging/winget/         winget manifests (portable package Devigami.SS14AutoJoin) and how to submit them
 tests/                    pytest; fake HTTP server; fixtures under docs/development/fixtures/
-.github/workflows/        ci.yml (tests, docs build, Windows artifact), docs.yml (Pages), release.yml
+.github/workflows/        ci.yml (tests, docs build, Windows and Linux builds that must start), docs.yml
+                          (Pages), release.yml (builds, smoke checks, release, winget submission)
 .github/ISSUE_TEMPLATE/   join problem, launcher not found, other platform, feature request
 build.py                  PyInstaller --onefile builds (window and console)
 ```
@@ -93,6 +100,13 @@ build.py                  PyInstaller --onefile builds (window and console)
 * The launcher writes `client.stdout.log` through an unflushed 4 KiB buffer: while the client is quiet
   (rejected, or waiting in the lobby) the file shows neither outcome. Decide from the UDP socket.
 * Patches that anchor on source lines can silently miss after `ruff format`; assert the anchor matched.
+* The window build is a GUI-subsystem program: `sys.stdout` is `None` unless the caller redirected it, and
+  a shell does not wait for it. Anything it must say on the command line goes through `console.emit`.
+* A PyInstaller build that finishes is not a build that starts. `uv python install 3.14` gives whatever
+  patch release that uv knows (3.14.6 in a container with a stale uv, 3.14.7 or later on the CI runners), and
+  on Linux the `_tkinter` of 3.14.6 has no RPATH: PyInstaller logs "Library not found: libtcl9.0.so" as a
+  warning, finishes, and the window build dies on import. `build.tcl_tk_libraries` names the files; a build
+  is not good until `tools/smoke_version.py` has started it.
 
 ## Git
 

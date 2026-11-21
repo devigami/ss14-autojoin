@@ -22,9 +22,17 @@ troubleshooting, FAQ).
 
 ## Quick start
 
-1. Download `SS14AutoJoin-<version>-windows-x64.exe` from the
-   [latest release](https://github.com/devigami/ss14-autojoin/releases/latest) and run it. Windows may warn that
-   the file is unsigned; choose *More info*, *Run anyway*.
+1. Install it with the Windows Package Manager, which is part of Windows 10 and 11, then open a new terminal
+   and run `SS14AutoJoin`:
+
+   ```powershell
+   winget install Devigami.SS14AutoJoin
+   ```
+
+   Or download `SS14AutoJoin-<version>-windows-x64.exe` from the
+   [latest release](https://github.com/devigami/ss14-autojoin/releases/latest) and run it. The file is not
+   code-signed, so Windows warns about a browser download; choose *More info*, *Run anyway*. Installing
+   through winget does not show that warning.
 2. The launcher folder is detected automatically (a running launcher, its log, your Steam libraries). Enter
    the server's `ss14://` or `ss14s://` address, or keep the default.
 3. Press **Start watching**. The log shows the player count, the attempt, and `joined`.
@@ -62,7 +70,7 @@ skip while panic bunker is on, what to do when unsure (keep the game or retry), 
 
 ```
 uv sync --all-groups                               # Python 3.14 and all dependencies, via uv
-uv run pytest                                      # 89 tests, including real-log fixtures
+uv run pytest                                      # the tests, including real-log fixtures
 uv run ruff check --fix . && uv run ruff format .
 uv run mkdocs serve                                # the documentation site
 uv run python build.py [--cli]                     # one-file executables into dist/

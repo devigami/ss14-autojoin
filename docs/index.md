@@ -32,7 +32,8 @@ and goes back to watching. When the join succeeds it plays a short fanfare and l
 
 ## Where next
 
-* [Getting started](getting-started.md): download, first run, the settings window.
+* [Getting started](getting-started.md): install with `winget install Devigami.SS14AutoJoin` or download,
+  first run, the settings window.
 * [How it works](how-it-works.md): the loop, and how success and failure are detected.
 * [Settings](settings.md) and the [command line](command-line.md).
 * [Troubleshooting](troubleshooting.md) and the [FAQ](faq.md).

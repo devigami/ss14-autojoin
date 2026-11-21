@@ -33,3 +33,15 @@ the same launcher, which handles one connection at a time.
 
 **Where are my settings?**
 `%APPDATA%\ss14-autojoin\config.toml`. Delete it to return to the defaults.
+
+**How do I update?**
+`winget upgrade Devigami.SS14AutoJoin` if you installed with winget; a new version reaches winget a few days
+after its release. Otherwise download the new file from the
+[releases page](https://github.com/devigami/ss14-autojoin/releases/latest) and replace the old one. Your
+settings are kept either way. The tool does not check for updates itself; it contacts nothing but the game
+server you point it at.
+
+**Why does Windows warn about the download?**
+The executable is not code-signed, and Windows warns about unsigned programs downloaded with a browser.
+Installing with `winget install Devigami.SS14AutoJoin` avoids the prompt; see
+[Troubleshooting](troubleshooting.md#windows-says-the-executable-is-unrecognised).

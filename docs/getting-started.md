@@ -1,27 +1,47 @@
 # Getting started
 
-## 1. Download
+## 1. Install
 
-Grab the latest `SS14AutoJoin.exe` from the
-[releases page](https://github.com/devigami/ss14-autojoin/releases/latest). It is a single file; put it anywhere.
-A console version, `ss14-autojoin.exe`, is attached to the same release for people who prefer a terminal
-(see [Command line](command-line.md)).
+### With winget (recommended)
 
-!!! tip "winget"
-    Once the package is accepted into the Windows Package Manager, `winget install Devigami.SS14AutoJoin`
-    installs the window as a portable command (`SS14AutoJoin`) without the SmartScreen prompt, because the
-    file never passes through the browser. Until then, download from the releases page.
+The Windows Package Manager is part of Windows 10 and 11. In a terminal:
 
-!!! note "SmartScreen"
-    The executable is not code-signed, so Windows may show "Windows protected your PC" the first time. Choose
-    **More info** and **Run anyway**, or build it yourself from source (below).
+```powershell
+winget install Devigami.SS14AutoJoin
+```
+
+This installs the window as a command rather than a Start menu entry: open a **new** terminal and run
+`SS14AutoJoin`. winget checks the download against the hash in the reviewed package manifest, and Windows
+does not show its "Windows protected your PC" prompt for a program installed this way.
+
+Later, `winget upgrade Devigami.SS14AutoJoin` updates it and `winget uninstall Devigami.SS14AutoJoin` removes
+it. A new version appears in winget a few days after it is released here, once the package repository's
+reviewers have approved it.
+
+### By download
+
+Grab `SS14AutoJoin-<version>-windows-x64.exe` from the
+[releases page](https://github.com/devigami/ss14-autojoin/releases/latest). It is a single file; put it
+anywhere. A console version, `ss14-autojoin-<version>-windows-x64.exe`, is attached to the same release for
+people who prefer a terminal (see [Command line](command-line.md)).
+
+!!! note "Windows protected your PC"
+    The executable is not code-signed, so Windows shows this prompt the first time you run a copy downloaded
+    with a browser. Choose **More info** and **Run anyway**, after comparing the file with `SHA256SUMS.txt`
+    on the release if you like. Installing with winget or building from source (below) avoids the prompt.
+
+### Which version do I have?
+
+The title bar shows it (from 1.0.1), as does `winget list Devigami.SS14AutoJoin`. From a terminal,
+`SS14AutoJoin --version` prints it without opening the window; see [Command line](command-line.md#which-version).
 
 You need the official Space Station 14 launcher installed (Steam or standalone) and to have logged in with it
 at least once.
 
 ## 2. First run
 
-Start `SS14AutoJoin.exe`. The window has three parts: the settings panel, the Start/Stop and Save buttons,
+Start SS14 Auto-Join: `SS14AutoJoin` after a winget install, or the downloaded file. The window has three
+parts: the settings panel, the Start/Stop and Save buttons,
 and a log.
 
 1. **Game / launcher folder** is filled in automatically when the launcher can be found: a running

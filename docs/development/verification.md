@@ -33,6 +33,17 @@ Anything not listed here is untested; the issue templates ask users for exactly 
 | 2026-09-26 | PyInstaller window build (`build.py`) | `SS14AutoJoin.exe` runs, same behaviour as from source; the fanfare plays from the bundled data; the setting switch is respected. |
 | 2026-09-26 | Icon | Explorer showed the icon once the exe was copied to a path without a cached entry; the taskbar shows it from the exe resource; the title bar needed the `WM_SETICON` fallback because Tk 9.0.4's `iconbitmap` did nothing on Windows. Log: `icon set (ico) ... with Tk 9.0.4`, `icon applied through the Windows API`. |
 
+## Checked off the reference machine
+
+These are real runs, but not on the reference Windows machine: the cloud development container (Linux) and
+GitHub's hosted runners. They say that a build starts and what it prints, nothing about joining.
+
+| Date | Where | Check | Result |
+|---|---|---|---|
+| 2026-11-21 | Linux container | Window and console builds with uv's Python 3.14.6, PyInstaller 6.22.3 (the pinned version, unchanged since 1.0.0) | Built without error, but the window build died on start: `ImportError: libtcl9.0.so`. In 3.14.6 `_tkinter` needs `libtcl9.0.so` and `libtcl9tk9.0.so` and has no RPATH, so `ldd` reports them "not found"; PyInstaller logs `Library not found` as a warning and leaves them out. |
+| 2026-11-21 | Linux container | Same builds with `build.tcl_tk_libraries` adding the two files | `tools/smoke_version.py`: `SS14 Auto-Join 1.0.0` and `ss14-autojoin 1.0.0`, exit 0. Under Xvfb the window opens from both builds (`SS14AutoJoin`, `ss14-autojoin gui`) and draws the settings panel; `timeout 10` ends it with status 124. A build without the fix exits 1 in the same check. |
+| 2026-11-21 | Linux container | Published `SS14AutoJoin-1.0.0-linux-x64` (checksum matches `SHA256SUMS.txt`) | Starts and stays open under Xvfb. Its bundle holds both Tcl/Tk libraries: it was built with Python 3.14.7, whose `_tkinter` has `RPATH $ORIGIN/../..` (read from the extension extracted from the bundle), so PyInstaller found them. The release was never affected; the container's older uv installs 3.14.6. |
+
 ## Not verified
 
 * Linux and macOS joining (the console build runs on Linux; the launcher path is the same in source).
@@ -43,3 +54,6 @@ Anything not listed here is untested; the issue templates ask users for exactly 
 * `winget install Devigami.SS14AutoJoin` from the community source, and that the installed `SS14AutoJoin`
   starts without a SmartScreen prompt (expected from the winget client source, see
   `packaging/winget/README.md`; the earlier local test used `--manifest`, which takes a different path).
+* `SS14AutoJoin --version` typed into PowerShell and into Command Prompt on a real desktop, with nothing
+  piped: this is the parent-console route of `console.py`, which no test can observe. Expected: the prompt
+  returns first, then `SS14 Auto-Join <version>` on its own line. Also that the title bar shows the version.

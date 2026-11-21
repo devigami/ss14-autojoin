@@ -14,6 +14,30 @@ window plus a few diagnostic commands. Every command prints `--help`.
 
 Exit codes: `0` success (joined), `1` not joined or unreachable, `2` bad arguments, `130` interrupted.
 
+## Which version
+
+```powershell
+ss14-autojoin --version     # the console tool: ss14-autojoin 1.0.1
+SS14AutoJoin --version      # the window program, from 1.0.1: SS14 Auto-Join 1.0.1
+```
+
+The window program prints its version and exits without opening the window. It is a windowed program, and
+Windows gives those no console of their own, which has two visible effects when you type the command into a
+terminal: the shell does not wait for it, so the prompt comes back first and the version appears on the line
+after it; and nothing is printed at all when it is started from a shortcut. Piping makes the shell wait and
+puts the output where you expect it:
+
+```powershell
+SS14AutoJoin --version | Out-Host          # PowerShell
+$version = SS14AutoJoin --version          # PowerShell, captured into a variable
+```
+
+```bat
+SS14AutoJoin --version | more
+```
+
+The title bar of the window shows the same version.
+
 ## Example
 
 ```powershell

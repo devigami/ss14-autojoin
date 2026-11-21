@@ -43,9 +43,25 @@ missing, the build is incomplete. The fanfare uses the Windows sound API; on oth
 
 ## Windows says the executable is unrecognised
 
-The builds are not code-signed yet (signing through SignPath Foundation is in progress). Choose **More info**
-and **Run anyway**, verify the download's checksum against `SHA256SUMS.txt` on the release, install through
-`winget` when the package is available, or build from source with `uv run python build.py`.
+The builds are not code-signed, so Windows shows "Windows protected your PC" for a copy downloaded with a
+browser. Three ways past it:
+
+* Install with `winget install Devigami.SS14AutoJoin` instead. winget verifies the file against the hash in
+  the reviewed package manifest and Windows does not prompt for a program installed that way.
+* Choose **More info** and **Run anyway**, after checking the download against `SHA256SUMS.txt` on the release
+  (`Get-FileHash .\SS14AutoJoin-<version>-windows-x64.exe` in PowerShell).
+* Build it yourself from source with `uv run python build.py`.
+
+## `SS14AutoJoin` is not recognised after a winget install
+
+winget puts the command in its own links folder and adds that folder to your `PATH`, which terminals read
+when they start. Open a new terminal window. `winget list Devigami.SS14AutoJoin` confirms the install.
+
+## `SS14AutoJoin --version` prints late, or nothing
+
+That is how Windows treats a windowed program started from a terminal: the shell does not wait for it. Pipe
+the output (`SS14AutoJoin --version | Out-Host`) or read the version from the title bar. Versions before
+1.0.1 ignore the flag and open the window. Details in [Command line](command-line.md#which-version).
 
 ## The icon looks wrong in Explorer
 

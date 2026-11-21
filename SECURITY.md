@@ -57,6 +57,10 @@ process termination, path handling in installation discovery, and parsing of the
 ## Binaries and supply chain
 
 Release executables are built by GitHub Actions from the tagged source, with no manual steps, and each release
-carries a `SHA256SUMS.txt`. The executables are **not code-signed**, so Windows SmartScreen will warn on first
-run; verify the checksum or build from source (`uv run python build.py`) if that matters to you. Dependencies
-are pinned in `uv.lock`; the only runtime dependency beyond the standard library is `psutil`.
+carries a `SHA256SUMS.txt`. Every build is started once in that workflow before it is published. The
+executables are **not code-signed**, so Windows SmartScreen warns the first time a browser download is run;
+verify the checksum or build from source (`uv run python build.py`) if that matters to you. The winget package
+`Devigami.SS14AutoJoin` installs the same Windows file from the same release: its manifest, reviewed in
+`microsoft/winget-pkgs`, pins the file's SHA-256 and winget refuses a download that does not match. A
+published release file is therefore never replaced. Dependencies are pinned in `uv.lock`; the only runtime
+dependency beyond the standard library is `psutil`.

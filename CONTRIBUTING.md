@@ -38,8 +38,9 @@ maintainer bumps the version in `pyproject.toml` and `src/ss14_autojoin/__init__
 
 1. Bump `version` in `pyproject.toml` and `__version__` in `src/ss14_autojoin/__init__.py` (same value).
 2. Merge to `master`. The `release` workflow sees a version without a tag, builds Windows and Linux
-   binaries, and publishes `v<version>` with generated notes and checksums.
+   binaries, starts each one (`tools/smoke_version.py`; a build that does not start or reports another
+   version stops the release), and publishes `v<version>` with generated notes and checksums.
 3. The `docs` workflow publishes the documentation site on every change to `docs/`.
 4. The `winget` job of the release workflow submits the new version to `microsoft/winget-pkgs` when the
-   `WINGET_TOKEN` secret is set; the first version of the package is submitted by hand
-   (`packaging/winget/README.md`).
+   `WINGET_TOKEN` secret is set, from the fork owned by the account in the `WINGET_FORK_USER` repository
+   variable (`packaging/winget/README.md`). Never replace a published release file: winget pins its hash.

@@ -212,3 +212,33 @@ Dated entries, newest last. Numbers where there are numbers.
   carries the mark of the web") was wrong and is corrected. Signing therefore stops being the only way past
   the prompt and remains worth having for browser downloads, signature-requiring policies and faster winget
   reviews. Not yet confirmed on a Windows machine; listed under "Not verified".
+
+## 2026-11-21: towards 1.0.1
+
+* Scope set by the maintainer: bring the user documentation up to date now that the package is in winget, and
+  start a 1.0.1 that picks up the winget reviewer's notes. No user-reported issues are open.
+* `SS14AutoJoin --version` (and `-V`) prints `SS14 Auto-Join <version>` and exits without creating a window
+  or reading the settings. The window build has no console, so the new `console.py` tries `sys.stdout`, then
+  the process's standard output handle, then the parent's console; the routes are chosen behind an interface
+  and tested with a fake, and two Windows-only tests run the real handle route. The title bar now shows the
+  version, which the issue template had been promising since 1.0.0.
+* `tools/smoke_version.py` starts a built executable and checks the line it prints. Its first run here found
+  a build defect unrelated to the change: the Linux window build made in the development container did not
+  start (`libtcl9.0.so` not found). Two wrong explanations were written down and discarded on the way to the
+  cause (a newer Python shipping Tcl/Tk differently; 1.0.0 linking it statically). What the files show: the
+  published 1.0.0 Linux build, downloaded and checked against its checksum, starts, contains both libraries,
+  and was built with Python 3.14.7, whose `_tkinter` has an RPATH; the container's uv installs 3.14.6,
+  whose `_tkinter` has none, and PyInstaller then merely warns and leaves the libraries out. So no release
+  was affected, and whether a build works depended on which Python patch release the machine happened to
+  install. `build.py` now names the libraries, which makes the build independent of that.
+* CI now builds on Linux as well as Windows, starts every executable, opens the Linux window on a virtual
+  display, and on Windows runs the terminal forms the documentation gives. The release workflow runs the
+  same start-up checks before anything is published.
+* The winget job would have failed on the next release: `winget-releaser` looks for the `winget-pkgs` fork
+  under the owner of this repository, and the fork that carried 1.0.0 belongs to the maintainer's own
+  account. The fork owner now comes from the repository variable `WINGET_FORK_USER`.
+* User documentation: winget is the recommended install; the download path, the unsigned-file prompt,
+  updating and finding the installed version are described; the stale "once accepted" and "SignPath in
+  progress" statements are gone. Release asset names in the docs now match the real ones.
+* The version stays 1.0.0 in this change. Bumping it is what publishes a release, and that waits for the
+  maintainer's checks on Windows and the decision on signing.

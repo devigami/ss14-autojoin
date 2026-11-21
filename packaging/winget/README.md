@@ -52,7 +52,17 @@ the new version; a `# Created using wingetcreate` line above them is fine.
 
 ## Later versions (automatic)
 
-`release.yml` has a `winget` job that runs `vedantmgoyal9/winget-releaser` after each release. It needs a
-repository secret `WINGET_TOKEN`: a classic personal access token with the `public_repo` scope belonging to an
-account that has a fork of `winget-pkgs`. The job is skipped while the secret is absent. It reads the new
-release's assets, computes the hash, and opens the update pull request in `winget-pkgs` itself.
+`release.yml` has a `winget` job that runs `vedantmgoyal9/winget-releaser` after each release. It reads the
+new release's assets, computes the hash, and opens the update pull request in `winget-pkgs` itself. Two
+repository settings (Settings, Secrets and variables, Actions) make it work:
+
+* Secret `WINGET_TOKEN`: a classic personal access token with the `public_repo` scope, belonging to an
+  account that has a fork of `winget-pkgs`. The job is skipped while the secret is absent.
+* Variable `WINGET_FORK_USER`: the name of that account. The action pushes its branch to
+  `<fork-user>/winget-pkgs` and by default assumes the owner of *this* repository (`fork-user` in the
+  action's `action.yml`, read at tag `v2`), which is wrong whenever the fork sits under a personal account
+  and this repository under an organisation. Without the variable the job fails after the release is
+  already published; the release itself is unaffected and the submission can then be made by hand.
+
+The update pull request still waits for the winget reviewers, so a version reaches `winget upgrade` some days
+after its release.
