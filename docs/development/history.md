@@ -197,3 +197,18 @@ Dated entries, newest last. Numbers where there are numbers.
   `SchemaHeaderManifestVersionMismatch` and `SchemaHeaderUrlPatternMismatch` because the
   `# yaml-language-server: $schema=` comment still named 1.10.0 (winget-cli checks the header URL against
   the field and the schema `$id`). Recorded in the packaging README.
+
+## 2026-11-21: in winget
+
+* `microsoft/winget-pkgs` PR 441430 was approved and merged after the schema header lines were corrected:
+  `Devigami.SS14AutoJoin` 1.0.0 is installable with `winget install`. The merged installer manifest carries
+  the hash of the published 1.0.0 window executable, unchanged.
+* The reviewer left two optional notes: `SS14AutoJoin --version` should print the version to the command
+  line, and the binary is unsigned (signing would raise trust and speed up review). Both are for the next
+  version.
+* Signing reassessed. Read in the winget client source (`DownloadFlow.cpp` at `d9acda8`): a file from a
+  trusted source whose hash matches is re-marked from the internet zone to the trusted zone, so a winget
+  install does not meet the SmartScreen first-run prompt. The packaging README's earlier reason ("never
+  carries the mark of the web") was wrong and is corrected. Signing therefore stops being the only way past
+  the prompt and remains worth having for browser downloads, signature-requiring policies and faster winget
+  reviews. Not yet confirmed on a Windows machine; listed under "Not verified".

@@ -6,10 +6,22 @@
 
 The package is `Devigami.SS14AutoJoin`, a *portable* installer: winget copies the window executable into its
 portable folder and adds the alias `SS14AutoJoin` (the first `Commands` entry; `PortableCommandAlias` applies
-only to files inside archives) to the path. Installing this way avoids the SmartScreen
-prompt, because the file never carries the browser's mark of the web.
+only to files inside archives) to the path.
 
-## First submission (once, by hand)
+Installing this way avoids the SmartScreen prompt. winget does mark the file it downloads, as coming from
+the internet zone, but once the hash matches the manifest and the source is a trusted one (the community
+`winget` source is), it re-marks the file as trusted zone, which SmartScreen's first-run check ignores.
+Read from `microsoft/winget-cli` at `d9acda8` (client 1.31): `UpdateInstallerFileMotwIfApplicable` and the
+hash check above it in `src/AppInstallerCLICore/Workflows/DownloadFlow.cpp`. Not yet run on Windows from the
+community source. A `winget install --manifest <folder>` of local files is not a trusted source: it takes the
+other branch, an attachment scan that leaves the internet-zone mark, so it is not evidence either way.
+winget does not sign anything: a browser download of the same file still warns, and policies that demand a
+signature still refuse it.
+
+The manifest pins the SHA-256 of the release asset. Never replace or re-sign an asset of a version that is
+already in winget, or every install of that version fails its hash check; signing starts with a new version.
+
+## First submission (once, by hand; done for 1.0.0, merged as PR 441430 in 2026-11)
 
 1. Fork `microsoft/winget-pkgs`, copy `manifests/d/Devigami/SS14AutoJoin/1.0.0/` into the same path in the
    fork, and open a pull request. Optionally validate first on Windows with

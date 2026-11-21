@@ -40,3 +40,6 @@ Anything not listed here is untested; the issue templates ask users for exactly 
 * Whether Steam must be running for the Steam launcher to cold-start (it was running in the test).
 * Servers with a whitelist or the panic bunker enabled (the deny reasons are handled from the source, not
   from a real log).
+* `winget install Devigami.SS14AutoJoin` from the community source, and that the installed `SS14AutoJoin`
+  starts without a SmartScreen prompt (expected from the winget client source, see
+  `packaging/winget/README.md`; the earlier local test used `--manifest`, which takes a different path).

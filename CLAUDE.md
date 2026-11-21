@@ -16,11 +16,15 @@ happened, newest last), `docs/development/verification.md` (what was checked on 
   builds Windows and Linux binaries and publishes `v<version>` with generated notes. `docs.yml` publishes the
   MkDocs site to GitHub Pages on changes under `docs/`.
 * **Untested**: Linux and macOS joining, the standalone (non-Steam) launcher. Issue templates ask for the logs.
-* **Signing**: not yet; SignPath Foundation wants proof of popularity, so a paid route (Microsoft Artifact
-  Signing) is under consideration. Windows builds carry a version resource. The winget package
-  (`packaging/winget/`, manifest schema 1.28.0) is submitted as `microsoft/winget-pkgs` PR 441430, waiting
-  on the maintainer to bump the schema on the PR branch after the bot deprecated 1.10.0; later versions go
-  through `release.yml` once the package exists.
+* **winget**: `Devigami.SS14AutoJoin` 1.0.0 is in `microsoft/winget-pkgs` (PR 441430, merged 2026-11). Its
+  manifest pins the SHA-256 of the 1.0.0 release asset, so that asset must never be replaced or re-signed.
+  Later versions go through the `winget` job in `release.yml`, which needs the `WINGET_TOKEN` secret.
+  The reviewer's optional notes for the next version: make `SS14AutoJoin --version` print the version, and
+  sign the binary. User docs still describe winget as pending.
+* **Signing**: not yet, and no longer blocking: a winget install shows no SmartScreen prompt (read from the
+  winget client source, not yet run on Windows; see `packaging/winget/README.md`). Direct downloads still
+  warn. SignPath Foundation wants proof of popularity; the paid route under consideration is Microsoft
+  Artifact Signing, as a `sign` job between `build` and `release`. Windows builds carry a version resource.
 
 ## Stack and commands
 
