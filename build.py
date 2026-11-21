@@ -74,6 +74,24 @@ VSVersionInfo(
 HIDDEN = ["psutil", "tkinter", "tkinter.ttk", "tkinter.filedialog", "tkinter.messagebox", "tkinter.scrolledtext"]
 
 
+def tcl_tk_libraries() -> list[Path]:
+    """Tcl/Tk shared libraries that PyInstaller's dependency scan cannot find by itself (Linux only).
+
+    uv's Python for Linux links ``_tkinter`` against ``libtcl9.0.so`` and ``libtcl9tk9.0.so`` in the
+    interpreter's own ``lib`` folder. Whether PyInstaller finds them depends on the Python patch release: in
+    3.14.7 (which built 1.0.0) the extension has ``RPATH $ORIGIN/../..`` and ``ldd`` resolves them; in 3.14.6
+    and 3.14.0 it has none, the interpreter finds them through its own RPATH, and ``ldd`` on the extension,
+    which is what PyInstaller runs, reports "not found". PyInstaller then only logs "Library not found" and
+    finishes: the Tcl scripts are in the bundle, the libraries are not, and the window dies on
+    ``import tkinter``. Naming the files puts them next to the extension whichever Python built it; when
+    PyInstaller finds them as well, the two entries collapse into one.
+    """
+    if not sys.platform.startswith("linux"):
+        return []
+    lib = Path(sys.base_prefix) / "lib"
+    return sorted({p for pattern in ("libtcl*.so*", "libtk*.so*") for p in lib.glob(pattern) if p.is_file()})
+
+
 def build(entry: Path, name: str, console: bool, description: str) -> None:
     args = [
         str(entry),
@@ -92,6 +110,8 @@ def build(entry: Path, name: str, console: bool, description: str) -> None:
     ]
     if sys.platform == "win32":
         args += ["--version-file", str(write_version_file(name, description, console))]
+    for library in tcl_tk_libraries():
+        args += ["--add-binary", f"{library}{os.pathsep}."]
     for module in HIDDEN:
         args += ["--hidden-import", module]
     PyInstaller.__main__.run(args)

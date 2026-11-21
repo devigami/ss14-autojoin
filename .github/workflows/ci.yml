@@ -37,8 +37,47 @@ jobs:
       - run: uv sync --all-groups
       - run: uv run python build.py
       - run: uv run python build.py --cli
-      - run: dist\ss14-autojoin.exe --version
+      # Both executables must start, exit 0 and print the version. The window build has no console, so this
+      # is the check that `SS14AutoJoin --version` reaches a caller that captures the output.
+      - run: uv run python tools/smoke_version.py dist/SS14AutoJoin.exe dist/ss14-autojoin.exe
+      - name: The forms the documentation gives for a terminal print the version
+        shell: pwsh
+        run: |
+          $captured = .\dist\SS14AutoJoin.exe --version
+          "PowerShell, captured: '$captured'"
+          $piped = (.\dist\SS14AutoJoin.exe --version | Out-String).Trim()
+          "PowerShell, piped:    '$piped'"
+          $viaCmd = (cmd /c "dist\SS14AutoJoin.exe --version | more" | Out-String).Trim()
+          "Command Prompt pipe:  '$viaCmd'"
+          if ($captured -notmatch '^SS14 Auto-Join \d+\.\d+\.\d+$') { throw "the captured form printed something else" }
+          if ($piped -ne $captured) { throw "the piped form printed something else" }
+          if ($viaCmd -ne $captured) { throw "the Command Prompt form printed something else" }
       - uses: actions/upload-artifact@v7
         with:
           name: SS14AutoJoin-windows
           path: dist/*.exe
+
+  linux-app:
+    # Joining is untested on Linux, but the builds we publish must at least start. With some Python patch
+    # releases PyInstaller cannot find the Tcl/Tk libraries, warns, and writes a window build that dies on
+    # import (see build.py); only starting the result shows it.
+    needs: test
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - run: uv python install 3.14
+      - run: uv sync --all-groups
+      - run: uv run python build.py
+      - run: uv run python build.py --cli
+      - run: uv run python tools/smoke_version.py dist/SS14AutoJoin dist/ss14-autojoin
+      - name: The window opens on a virtual display and stays open
+        env:
+          SS14_AUTOJOIN_CONFIG: ${{ runner.temp }}/ss14-autojoin-ci.toml
+        run: |
+          # timeout ends a healthy window after 10 s with status 124; a crash exits sooner with its own status
+          status=0
+          xvfb-run -a timeout 10 dist/SS14AutoJoin || status=$?
+          echo "exit status: $status"
+          test "$status" -eq 124

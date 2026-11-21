@@ -55,6 +55,18 @@ jobs:
       - run: uv run pytest
       - run: uv run python build.py
       - run: uv run python build.py --cli
+      - name: The built executables start and report this version
+        shell: bash
+        run: uv run python tools/smoke_version.py dist/SS14AutoJoin* dist/ss14-autojoin*
+      - name: The Linux window opens on a virtual display and stays open
+        if: matrix.label == 'linux'
+        env:
+          SS14_AUTOJOIN_CONFIG: ${{ runner.temp }}/ss14-autojoin-release.toml
+        run: |
+          status=0
+          xvfb-run -a timeout 10 dist/SS14AutoJoin || status=$?
+          echo "exit status: $status"
+          test "$status" -eq 124
       - name: Name the binaries
         shell: bash
         run: |
@@ -115,5 +127,8 @@ jobs:
           release-tag: ${{ needs.version.outputs.tag }}
           installers-regex: 'SS14AutoJoin-.*-windows-x64\.exe$'
           token: ${{ secrets.WINGET_TOKEN }}
+          # The account that owns the winget-pkgs fork the token can push to. The action assumes the owner of
+          # this repository; set the repository variable WINGET_FORK_USER when the fork lives elsewhere.
+          fork-user: ${{ vars.WINGET_FORK_USER || github.repository_owner }}
       - if: env.HAS_WINGET_TOKEN != 'true'
         run: echo "WINGET_TOKEN not set; skipping the winget submission (see packaging/winget/README.md)."

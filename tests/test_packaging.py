@@ -58,6 +58,58 @@ def test_checked_in_manifest_for_1_0_0_matches_the_generator() -> None:
         assert (folder / name).read_text() == text, name
 
 
+def test_the_version_is_the_same_everywhere() -> None:
+    """pyproject.toml drives the release, __init__ is what --version prints, uv.lock is committed: keep them in step."""
+    import tomllib
+
+    from ss14_autojoin import __version__
+
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+    lock = tomllib.loads((ROOT / "uv.lock").read_text(encoding="utf-8"))
+    (locked,) = [p["version"] for p in lock["package"] if p["name"] == "ss14-autojoin"]
+    assert __version__ == project == locked
+
+
+def test_smoke_version_accepts_only_one_line_ending_in_the_version(tmp_path: Path) -> None:
+    smoke = load_module("smoke_version", ROOT / "tools" / "smoke_version.py")
+    script = tmp_path / "fake_exe.py"
+
+    def run(body: str) -> str | None:
+        script.write_text(body, encoding="utf-8")
+        launcher = tmp_path / ("fake.cmd" if sys.platform == "win32" else "fake.sh")
+        if sys.platform == "win32":
+            launcher.write_text(f'@"{sys.executable}" "{script}" %*\r\n', encoding="utf-8")
+        else:
+            launcher.write_text(f'#!/bin/sh\nexec "{sys.executable}" "{script}" "$@"\n', encoding="utf-8")
+            launcher.chmod(0o755)
+        return smoke.check(launcher, "1.2.3")
+
+    assert run("print('SS14 Auto-Join 1.2.3')") is None
+    assert run("print('ss14-autojoin 1.2.3')") is None
+    assert "expected one line" in run("print('SS14 Auto-Join 1.2.4')")
+    assert "expected one line" in run("pass")  # a windowed build that printed nothing
+    assert "expected one line" in run("print('warning'); print('x 1.2.3')")
+    assert "exit code 3" in run("import sys; print('x 1.2.3'); sys.exit(3)")
+    assert smoke.expected_version() == load_module("build", ROOT / "build.py").VERSION
+
+
+def test_build_names_the_tcl_tk_libraries_only_on_linux(tmp_path: Path, monkeypatch) -> None:
+    build = load_module("build", ROOT / "build.py")
+    lib = tmp_path / "lib"
+    lib.mkdir()
+    for name in ("libtcl9.0.so", "libtcl9tk9.0.so", "libpython3.14.so.1.0", "libtcl-notes.txt"):
+        (lib / name).write_bytes(b"")
+    (lib / "itcl4.3.5").mkdir()  # extension packages live in folders and are not needed by tkinter
+    monkeypatch.setattr(build.sys, "base_prefix", str(tmp_path))
+    monkeypatch.setattr(build.sys, "platform", "linux")
+    assert [p.name for p in build.tcl_tk_libraries()] == ["libtcl9.0.so", "libtcl9tk9.0.so"]
+    monkeypatch.setattr(build.sys, "platform", "win32")
+    assert build.tcl_tk_libraries() == []  # PyInstaller finds the DLLs itself on Windows
+    monkeypatch.setattr(build.sys, "platform", "linux")
+    monkeypatch.setattr(build.sys, "base_prefix", str(tmp_path / "statically-linked-python"))
+    assert build.tcl_tk_libraries() == []  # nothing to add, nothing to break
+
+
 def test_build_version_tuple_and_version_file() -> None:
     sys.path.insert(0, str(ROOT))
     build = load_module("build", ROOT / "build.py")
