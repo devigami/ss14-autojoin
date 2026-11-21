@@ -1,0 +1,117 @@
+from __future__ import annotations
+
+import io
+import subprocess
+import sys
+
+import pytest
+
+from ss14_autojoin import __version__, app
+from ss14_autojoin.console import emit
+
+
+class FakeConsole:
+    """Stands in for kernel32: records what each route was given and answers as scripted."""
+
+    def __init__(self, handle: bool = False, parent: bool = False) -> None:
+        self.handle, self.parent = handle, parent
+        self.handle_data: list[bytes] = []
+        self.parent_text: list[str] = []
+
+    def write_std_handle(self, data: bytes) -> bool:
+        self.handle_data.append(data)
+        return self.handle
+
+    def write_parent_console(self, text: str) -> bool:
+        self.parent_text.append(text)
+        return self.parent
+
+
+class BrokenStream(io.StringIO):
+    def write(self, s: str) -> int:
+        raise OSError("the pipe is gone")
+
+
+def test_a_python_stream_is_used_when_there_is_one() -> None:
+    out, api = io.StringIO(), FakeConsole(handle=True, parent=True)
+    assert emit("SS14 Auto-Join 9.9.9", stream=out, platform="win32", api=api) == "stdout"
+    assert out.getvalue() == "SS14 Auto-Join 9.9.9\n"
+    assert api.handle_data == [] and api.parent_text == []  # nothing is printed twice
+
+
+def test_windowed_build_with_redirected_output_writes_to_the_handle() -> None:
+    api = FakeConsole(handle=True, parent=True)
+    assert emit("SS14 Auto-Join 9.9.9", stream=None, platform="win32", api=api) == "handle"
+    assert api.handle_data == [b"SS14 Auto-Join 9.9.9\r\n"]
+    assert api.parent_text == []
+
+
+def test_windowed_build_typed_in_a_terminal_writes_to_the_parent_console_on_a_fresh_line() -> None:
+    api = FakeConsole(handle=False, parent=True)
+    assert emit("SS14 Auto-Join 9.9.9", stream=None, platform="win32", api=api) == "console"
+    # the shell's prompt is already back, so the text must not continue that line
+    assert api.parent_text == ["\nSS14 Auto-Join 9.9.9\n"]
+
+
+def test_nobody_listening_is_not_an_error() -> None:
+    assert emit("x", stream=None, platform="win32", api=FakeConsole()) == "none"  # started from a shortcut
+    assert emit("x", stream=None, platform="linux") == "none"  # no Windows calls off Windows
+
+
+def test_a_broken_stream_falls_through_to_the_handles() -> None:
+    api = FakeConsole(handle=True)
+    assert emit("x", stream=BrokenStream(), platform="win32", api=api) == "handle"
+    assert emit("x", stream=BrokenStream(), platform="linux") == "none"
+
+
+def test_window_version_flag_prints_and_never_opens_a_window(
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def no_window(*a: object, **k: object) -> None:
+        raise AssertionError("--version must not create a window")
+
+    monkeypatch.setattr(app.tk, "Tk", no_window)
+    monkeypatch.setattr(app, "load", no_window)  # nor read the settings file
+    for flag in ("--version", "-V"):
+        assert app.main([flag]) == 0
+        assert capsys.readouterr().out == f"SS14 Auto-Join {__version__}\n"
+    assert app.version_line() == f"SS14 Auto-Join {__version__}"  # also the title bar
+
+
+def test_cli_gui_command_does_not_pass_its_own_arguments_to_the_window(monkeypatch: pytest.MonkeyPatch) -> None:
+    from ss14_autojoin import cli
+
+    seen: list[object] = []
+    monkeypatch.setattr(app, "main", lambda argv=None: seen.append(argv) or 0)
+    monkeypatch.setattr(sys, "argv", ["ss14-autojoin", "gui"])
+    assert cli.main(["gui"]) == 0
+    assert seen == [[]]
+
+
+# The two tests below run the real kernel32 calls, so they only exist on Windows (CI has a Windows runner).
+# They cover the redirected-output route. Typing the command in a terminal (the parent-console route) cannot
+# be observed from a test and is checked by hand; see docs/development/verification.md.
+windows_only = pytest.mark.skipif(sys.platform != "win32", reason="real Windows console API")
+
+
+@windows_only
+def test_real_std_handle_route_reaches_a_pipe() -> None:
+    code = (
+        "import sys; from ss14_autojoin.console import WindowsConsole; "
+        "sys.exit(0 if WindowsConsole().write_std_handle(b'through the handle\\r\\n') else 3)"
+    )
+    done = subprocess.run([sys.executable, "-c", code], capture_output=True, timeout=60, check=False)
+    assert done.returncode == 0, done.stderr
+    assert done.stdout == b"through the handle\r\n"
+
+
+@windows_only
+def test_real_emit_without_a_python_stream_reaches_a_pipe() -> None:
+    # What the window executable looks like to Python: no sys.stdout, yet the caller is capturing the output.
+    code = (
+        "import sys; sys.stdout = None; from ss14_autojoin.console import emit; "
+        "route = emit('SS14 Auto-Join 9.9.9'); sys.exit(0 if route == 'handle' else 4)"
+    )
+    done = subprocess.run([sys.executable, "-c", code], capture_output=True, timeout=60, check=False)
+    assert done.returncode == 0, done.stderr
+    assert done.stdout == b"SS14 Auto-Join 9.9.9\r\n"

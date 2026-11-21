@@ -252,7 +252,7 @@ def _print_event(kind: str, message: str) -> None:
 def cmd_gui(args: argparse.Namespace) -> int:
     from .app import main as gui_main  # noqa: PLC0415 - tkinter only when asked for
 
-    return gui_main()
+    return gui_main([])
 
 
 _COMMANDS = {

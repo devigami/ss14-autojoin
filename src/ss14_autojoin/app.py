@@ -12,15 +12,23 @@ import sys
 import threading
 import time
 import tkinter as tk
+from collections.abc import Sequence
 from pathlib import Path
 from tkinter import filedialog, messagebox, scrolledtext, ttk
 
+from . import __version__
 from .config import Settings, config_path, load, save
+from .console import emit
 from .joiner import Joiner
 from .launcher import find_launcher, launcher_data_dir, running_launcher_exes
 from .notify import play_success
 
 TITLE = "SS14 Auto-Join"
+
+
+def version_line() -> str:
+    """What the title bar shows and what ``--version`` prints."""
+    return f"{TITLE} {__version__}"
 
 
 def settings_to_form(settings: Settings) -> dict[str, str | bool]:
@@ -80,7 +88,7 @@ class App:
         self.joiner: Joiner | None = None
         self.worker: threading.Thread | None = None
         self.vars: dict[str, tk.Variable] = {}
-        root.title(TITLE)
+        root.title(version_line())
         root.minsize(640, 520)
         self._build()
         self._set_icon()
@@ -299,7 +307,12 @@ class App:
         self.log.configure(state="disabled")
 
 
-def main() -> int:
+def main(argv: Sequence[str] | None = None) -> int:
+    """Open the window. ``--version`` (or ``-V``) prints the version to the command line and exits instead."""
+    args = sys.argv[1:] if argv is None else list(argv)
+    if "--version" in args or "-V" in args:
+        emit(version_line())  # the window executable has no console of its own; see console.py
+        return 0
     path = config_path()
     root = tk.Tk()
     App(root, load(path), path)
