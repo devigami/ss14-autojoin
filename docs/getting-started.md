@@ -2,6 +2,9 @@
 
 ## 1. Install
 
+You need the official Space Station 14 launcher installed (Steam or standalone) and to have logged in with it
+at least once.
+
 ### With winget (recommended)
 
 The Windows Package Manager is part of Windows 10 and 11. In a terminal:
@@ -32,11 +35,9 @@ people who prefer a terminal (see [Command line](command-line.md)).
 
 ### Which version do I have?
 
-The title bar shows it (from 1.0.1), as does `winget list Devigami.SS14AutoJoin`. From a terminal,
-`SS14AutoJoin --version` prints it without opening the window; see [Command line](command-line.md#which-version).
-
-You need the official Space Station 14 launcher installed (Steam or standalone) and to have logged in with it
-at least once.
+`winget list Devigami.SS14AutoJoin` shows it. From 1.0.1 the title bar shows it too, and
+`SS14AutoJoin --version` prints it in a terminal without opening the window; see
+[Command line](command-line.md#which-version).
 
 ## 2. First run
 
