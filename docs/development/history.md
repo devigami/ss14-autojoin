@@ -272,3 +272,5 @@ Dated entries, newest last. Numbers where there are numbers.
   accepted: PowerShell does not redraw its prompt after a windowed program writes to its console, so the
   next command is typed on a line without one. Sending an Enter keystroke to the terminal would tidy that
   up and could also run whatever the user had half typed, so the tool does not do it.
+* The maintainer set the repository variable `WINGET_FORK_USER` and the secret `WINGET_TOKEN`, so the
+  automatic winget submission is configured. It is untested until a release runs it.

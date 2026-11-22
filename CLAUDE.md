@@ -25,7 +25,9 @@ happened, newest last), `docs/development/verification.md` (what was checked on 
 * **winget**: `Devigami.SS14AutoJoin` 1.0.0 is in `microsoft/winget-pkgs` (PR 441430, merged 2026-11). Its
   manifest pins the SHA-256 of the 1.0.0 release asset, so that asset must never be replaced or re-signed.
   Later versions go through the `winget` job in `release.yml`, which needs the `WINGET_TOKEN` secret and the
-  `WINGET_FORK_USER` variable (the account that owns the `winget-pkgs` fork).
+  `WINGET_FORK_USER` variable (the account that owns the `winget-pkgs` fork). The maintainer set both on
+  2026-11-22; they cannot be read from a session, and the job only runs on a release, so the 1.0.1 release
+  is their first test. The token is a personal access token and will expire.
 * **Signing**: not yet, and no longer blocking: a winget install shows no SmartScreen prompt (read from the
   winget client source, not yet run on Windows; see `packaging/winget/README.md`). Direct downloads still
   warn. SignPath Foundation wants proof of popularity; the paid route under consideration is Microsoft
