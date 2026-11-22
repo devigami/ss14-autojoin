@@ -20,7 +20,8 @@ happened, newest last), `docs/development/verification.md` (what was checked on 
   the release trigger. Done so far: `SS14AutoJoin --version` (window build, through `console.py`), the
   version in the title bar, user docs that recommend winget, start-up smoke checks for every build in CI and
   before a release, the Linux Tcl/Tk bundling fix, the winget fork owner from a repository variable.
-  Still to check by hand on Windows before releasing: see "Not verified" in `verification.md`.
+  `SS14AutoJoin --version` is verified in PowerShell on the reference machine, bare and piped. Still to
+  check by hand on Windows before releasing: see "Not verified" in `verification.md`.
 * **winget**: `Devigami.SS14AutoJoin` 1.0.0 is in `microsoft/winget-pkgs` (PR 441430, merged 2026-11). Its
   manifest pins the SHA-256 of the 1.0.0 release asset, so that asset must never be replaced or re-signed.
   Later versions go through the `winget` job in `release.yml`, which needs the `WINGET_TOKEN` secret and the

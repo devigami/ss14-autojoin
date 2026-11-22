@@ -267,3 +267,8 @@ Dated entries, newest last. Numbers where there are numbers.
   screen. Two Windows-only tests use it on a windowed Python two console-less levels down, one of them the
   control that asks only the parent and must see nothing; `tools/smoke_version.py` uses it on the built
   window executable, in CI and before a release.
+* The maintainer rebuilt and repeated the check in PowerShell: the bare command now prints (prompt first,
+  then the version on the next line) and the piped form prints in place. One cosmetic effect is left and
+  accepted: PowerShell does not redraw its prompt after a windowed program writes to its console, so the
+  next command is typed on a line without one. Sending an Enter keystroke to the terminal would tidy that
+  up and could also run whatever the user had half typed, so the tool does not do it.

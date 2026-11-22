@@ -24,8 +24,8 @@ SS14AutoJoin --version      # the window program, from 1.0.1: SS14 Auto-Join 1.0
 The window program prints its version and exits without opening the window. It is a windowed program, and
 Windows gives those no console of their own, which has two visible effects when you type the command into a
 terminal: the shell does not wait for it, so the prompt comes back first and the version appears on the line
-after it; and nothing is printed at all when it is started from a shortcut. Piping makes the shell wait and
-puts the output where you expect it:
+after it, with no new prompt drawn below (press Enter for one, or just type); and nothing is printed at all
+when it is started from a shortcut. Piping makes the shell wait and puts the output where you expect it:
 
 ```powershell
 SS14AutoJoin --version | Out-Host                  # PowerShell: wait for it and show the line
