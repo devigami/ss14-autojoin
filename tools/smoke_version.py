@@ -7,15 +7,19 @@ executable has no console, so this is the check that its version still reaches a
 output; it also proves that a freshly built one-file executable starts at all. CI runs it after every build
 and the release workflow runs it before anything is published.
 
-The window executable (file name starting with ``SS14AutoJoin``) gets a second run in which the caller stops
-listening before the answer comes, as PowerShell does in ``$v = SS14AutoJoin --version``. It must still exit
-0 and say nothing on the error stream.
+The window executable (file name starting with ``SS14AutoJoin``) gets two more runs. In one the caller stops
+listening before the answer comes, as PowerShell does in ``$v = SS14AutoJoin --version``: it must still exit
+0 and say nothing on the error stream. In the other, on Windows, it is started from a fresh console with
+nothing redirected, as when the command is typed into a terminal (``tools/console_probe.py``): the version
+must appear on that console.
 """
 
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
+import tempfile
 import tomllib
 from pathlib import Path
 
@@ -63,6 +67,28 @@ def check_unheard(exe: Path) -> str | None:
     return None
 
 
+def check_typed_in_a_terminal(exe: Path, version: str) -> str | None:
+    """Windows: run ``--version`` from a fresh console with nothing redirected. None when the version shows there."""
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp) / "probe.json"
+        subprocess.run(
+            [sys.executable, str(ROOT / "tools" / "console_probe.py"), str(out), str(exe.resolve()), "--version"],
+            creationflags=subprocess.CREATE_NEW_CONSOLE,  # type: ignore[attr-defined]
+            timeout=TIMEOUT + 60,
+            check=False,
+        )
+        if not out.exists():
+            return "typed in a terminal: the console probe wrote no result"
+        result = json.loads(out.read_text(encoding="utf-8"))
+    print(f"{exe}: typed in a terminal: {result}")
+    shown = [line.strip() for line in str(result.get("screen", "")).splitlines() if line.strip()]
+    if "error" in result or result.get("returncode") != 0:
+        return f"typed in a terminal: {result}"
+    if len(shown) != 1 or shown[0].split()[-1] != version:
+        return f"typed in a terminal: expected one line ending in {version!r} on the console, saw {shown!r}"
+    return None
+
+
 def is_window_build(exe: Path) -> bool:
     return exe.name.startswith("SS14AutoJoin")
 
@@ -73,7 +99,10 @@ def main(argv: list[str]) -> int:
         return 2
     version = expected_version()
     failures = [f"{exe}: {problem}" for exe in map(Path, argv) if (problem := check(exe, version))]
-    failures += [f"{exe}: {p}" for exe in map(Path, argv) if is_window_build(exe) and (p := check_unheard(exe))]
+    windows = [exe for exe in map(Path, argv) if is_window_build(exe)]
+    failures += [f"{exe}: {p}" for exe in windows if (p := check_unheard(exe))]
+    if sys.platform == "win32":
+        failures += [f"{exe}: {p}" for exe in windows if (p := check_typed_in_a_terminal(exe, version))]
     for failure in failures:
         print(f"FAILED {failure}")
     return 1 if failures else 0

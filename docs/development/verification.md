@@ -32,6 +32,7 @@ Anything not listed here is untested; the issue templates ask users for exactly 
 | 2026-09-26 | `ss14-autojoin gui` | Launcher folder pre-filled from detection; Save wrote `%APPDATA%\ss14-autojoin\config.toml`; Start joined Lizard through the window (77/80, PID after 2 s, joined at 15 s). |
 | 2026-09-26 | PyInstaller window build (`build.py`) | `SS14AutoJoin.exe` runs, same behaviour as from source; the fanfare plays from the bundled data; the setting switch is respected. |
 | 2026-09-26 | Icon | Explorer showed the icon once the exe was copied to a path without a cached entry; the taskbar shows it from the exe resource; the title bar needed the `WM_SETICON` fallback because Tk 9.0.4's `iconbitmap` did nothing on Windows. Log: `icon set (ico) ... with Tk 9.0.4`, `icon applied through the Windows API`. |
+| 2026-11-22 | `dist\SS14AutoJoin.exe --version` typed into PowerShell, built locally from commit `98850f7` | **No output.** With `\| Out-Host` the same build printed `SS14 Auto-Join 1.0.0` on a new line. The piped route worked; the console route did not: the code attached to the console of its parent, and in a one-file build the program's parent is the bootloader, a windowed process with no console. Fixed by looking up the process tree for the nearest ancestor that has one; to be re-checked here. |
 
 ## Checked off the reference machine
 
@@ -57,6 +58,8 @@ GitHub's hosted runners. They say that a build starts and what it prints, nothin
 * `winget install Devigami.SS14AutoJoin` from the community source, and that the installed `SS14AutoJoin`
   starts without a SmartScreen prompt (expected from the winget client source, see
   `packaging/winget/README.md`; the earlier local test used `--manifest`, which takes a different path).
-* `SS14AutoJoin --version` typed into PowerShell and into Command Prompt on a real desktop, with nothing
-  piped: this is the parent-console route of `console.py`, which no test can observe. Expected: the prompt
-  returns first, then `SS14 Auto-Join <version>` on its own line. Also that the title bar shows the version.
+* `SS14AutoJoin --version` typed into PowerShell and into Command Prompt on the reference machine with the
+  fix of 2026-11-22 (the first attempt printed nothing there, see above). The runners now check the same
+  thing from a console they create themselves (`tools/console_probe.py`), which is not a person's terminal:
+  PowerShell, PSReadLine and Windows Terminal are not in that picture. Expected: the prompt returns first,
+  then `SS14 Auto-Join <version>` on its own line. Also that the title bar shows the version.

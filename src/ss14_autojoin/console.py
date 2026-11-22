@@ -11,9 +11,11 @@ GUI-subsystem program. Started from a terminal, such a program has no console of
    fail again when the interpreter exits, with an "Exception ignored while flushing sys.stdout" message.
 2. The process's standard output handle, when the caller redirected it (a pipe or a file) but Python made
    no stream for it.
-3. The console of the parent process, which is the terminal the command was typed in, attached for the
-   occasion. The shell does not wait for a windowed program, so its prompt is already back by the time the
-   text arrives; the text therefore starts on a fresh line.
+3. The console of the terminal the command was typed in, attached for the occasion. That terminal is not
+   the parent process: a one-file build runs as two processes, the bootloader that unpacks it and the
+   program itself, and the program's parent is the bootloader, a windowed program with no console. So the
+   nearest ancestor that has a console is used. The shell does not wait for a windowed program, so its
+   prompt is already back by the time the text arrives; the text therefore starts on a fresh line.
 
 Everything Windows-specific sits behind :class:`ConsoleApi`, so the choice between the routes is tested with
 a fake. :class:`WindowsConsole` is the real one; what it does on a real machine is in the verification record.
@@ -23,8 +25,14 @@ from __future__ import annotations
 
 import os
 import sys
+from collections.abc import Callable, Iterable
+from itertools import islice
 from types import EllipsisType
 from typing import Protocol, TextIO
+
+# How far up the process tree to look for a console. The one-file build needs two (bootloader, terminal);
+# the rest is room for launchers and wrappers in between. Started from a shortcut, no ancestor has one.
+MAX_ANCESTORS = 8
 
 
 class ConsoleApi(Protocol):
@@ -32,7 +40,7 @@ class ConsoleApi(Protocol):
         """Write to the process's standard output handle. False when there is none worth writing to."""
 
     def write_parent_console(self, text: str) -> bool:
-        """Attach to the parent process's console and write there. False when there is no such console."""
+        """Attach to the console of the nearest ancestor that has one and write there. False when none has."""
 
 
 def emit(
@@ -81,6 +89,15 @@ def _write_stream(out: TextIO, text: str) -> bool:
     return True
 
 
+def attach_nearest_console(attach: Callable[[int], bool], ancestors: Iterable[int], limit: int = MAX_ANCESTORS) -> bool:
+    """Attach to the console of the nearest ancestor process that has one, looking at most ``limit`` levels up.
+
+    ``ancestors`` are process ids, parent first; ``attach`` tries one and says whether this process now has a
+    console.
+    """
+    return any(attach(pid) for pid in islice(ancestors, max(limit, 0)))
+
+
 class WindowsConsole:
     """The real :class:`ConsoleApi`, through kernel32. Construct it on Windows only."""
 
@@ -89,10 +106,11 @@ class WindowsConsole:
     FILE_TYPE_UNKNOWN = 0
     ERROR_ACCESS_DENIED = 5
 
-    def __init__(self) -> None:
+    def __init__(self, max_ancestors: int = MAX_ANCESTORS) -> None:
         import ctypes
         from ctypes import wintypes
 
+        self.max_ancestors = max_ancestors
         self._ctypes = ctypes
         self._dword = wintypes.DWORD
         k32 = ctypes.WinDLL("kernel32", use_last_error=True)  # type: ignore[attr-defined]
@@ -124,14 +142,28 @@ class WindowsConsole:
         return bool(ok) and written.value == len(data)
 
     def write_parent_console(self, text: str) -> bool:
-        if not self._k32.AttachConsole(self.ATTACH_PARENT_PROCESS):
-            # "Access denied" means this process already has a console, which CONOUT$ then opens just the
-            # same; any other error means the parent has no console to attach to.
-            if self._ctypes.get_last_error() != self.ERROR_ACCESS_DENIED:
-                return False
+        if not attach_nearest_console(self._attach, self._ancestors(), self.max_ancestors):
+            return False
         try:
             with open("CONOUT$", "w", encoding="utf-8") as console:
                 console.write(text)
         except OSError:
             return False
         return True
+
+    def _attach(self, pid: int) -> bool:
+        if self._k32.AttachConsole(pid):
+            return True
+        # "Access denied" means this process already has a console, which CONOUT$ then opens just the same.
+        # Anything else: that process has no console (the bootloader, Explorer) or is gone.
+        return self._ctypes.get_last_error() == self.ERROR_ACCESS_DENIED
+
+    def _ancestors(self) -> list[int]:
+        """Process ids from the parent upwards. The parent always comes first, by its special id."""
+        import psutil
+
+        try:
+            further = [p.pid for p in psutil.Process().parents()[1:]]
+        except psutil.Error:
+            further = []
+        return [self.ATTACH_PARENT_PROCESS, *further]

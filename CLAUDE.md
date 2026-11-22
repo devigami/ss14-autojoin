@@ -64,7 +64,8 @@ src/ss14_autojoin/        server.py (addresses, /status), launcher.py (install d
                           console.py (printing from the windowed build: stdout, std handle, parent console),
                           gui_main.py and cli_main.py (PyInstaller entry scripts, imported by nothing),
                           data/ (fanfare.wav, icon.png, icon.ico; generated, public domain)
-tools/                    make_fanfare.py, make_icon.py, make_winget_manifest.py, smoke_version.py
+tools/                    make_fanfare.py, make_icon.py, make_winget_manifest.py, smoke_version.py,
+                          console_probe.py (plays the terminal for a windowed program, Windows only)
 packaging/winget/         winget manifests (portable package Devigami.SS14AutoJoin) and how to submit them
 tests/                    pytest; fake HTTP server; fixtures under docs/development/fixtures/
 .github/workflows/        ci.yml (tests, docs build, Windows and Linux builds that must start), docs.yml
@@ -104,6 +105,10 @@ build.py                  PyInstaller --onefile builds (window and console)
   a shell does not wait for it. Anything it must say on the command line goes through `console.emit`.
   PowerShell waits only when something follows it in the pipeline (`app | Out-String` works, `$v = app` is
   empty and closes the pipe), so `emit` writes unbuffered: text left in a buffer fails again at exit.
+* A one-file build is two processes: the bootloader and, as its child, the program. Handles are passed down
+  through the bootloader, but "the parent's console" is the bootloader's, and it has none. Anything that
+  means "the terminal I was started from" has to look further up (`console.attach_nearest_console`).
+  Pipes cannot observe a console; `tools/console_probe.py` reads a real one.
 * A PyInstaller build that finishes is not a build that starts. `uv python install 3.14` gives whatever
   patch release that uv knows (3.14.6 in a container with a stale uv, 3.14.10 on the CI runners), and
   on Linux the `_tkinter` of 3.14.6 has no RPATH: PyInstaller logs "Library not found: libtcl9.0.so" as a

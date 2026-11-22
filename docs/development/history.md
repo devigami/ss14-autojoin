@@ -249,3 +249,21 @@ Dated entries, newest last. Numbers where there are numbers.
   proved. The runners use Python 3.14.10, which does not have the Tcl/Tk defect of the container's 3.14.6.
 * The version stays 1.0.0 in this change. Bumping it is what publishes a release, and that waits for the
   maintainer's checks on Windows and the decision on signing.
+
+## 2026-11-22: the terminal is not the parent
+
+* The Dependabot updates (certifi, setuptools, mkdocs-material, pytest, ruff) were merged to `master`; the
+  branch was rebased onto it. Nothing but `uv.lock` differed, and every check passed on the new versions.
+* The maintainer built the window program on the reference machine and typed `dist\SS14AutoJoin.exe
+  --version` into PowerShell: no output. Piped into `Out-Host` it printed the version. So the route that no
+  test could observe was the broken one. Cause: `console.py` attached to the console of its parent process,
+  taking that to be the terminal. A one-file build runs as two processes, and the program's parent is the
+  bootloader, a windowed process with no console; the terminal is one level further up. The pipe routes
+  never noticed, because handles are passed down through the bootloader.
+* Fix: look up the process tree (psutil, already a dependency) and attach to the nearest ancestor that has a
+  console, at most eight levels up. Started from a shortcut there is none, and nothing is printed.
+* The route is no longer unobservable. `tools/console_probe.py` plays the terminal: started with its own
+  fresh console, it runs a command with nothing redirected and reads the characters off its console's
+  screen. Two Windows-only tests use it on a windowed Python two console-less levels down, one of them the
+  control that asks only the parent and must see nothing; `tools/smoke_version.py` uses it on the built
+  window executable, in CI and before a release.
